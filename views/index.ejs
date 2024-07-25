@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Foodies</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+      integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"
+      integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script src="/static/js/script.js"></script>
+  </head>
+
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg bg-light fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="/"
+          ><img
+            src="/static/image/logo.png"
+            style="height: auto; width: 130px"
+            alt=""
+        /></a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#counter">About us</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/foods/1">Explore foods</a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                data-bs-toggle="modal"
+                data-bs-target="#staticBackdrop"
+                ><i class="fas fa-shopping-basket ps-3"></i
+                ><small class="cart-num"></small
+              ></a>
+            </li>
+
+            <% if (loginUser) { %>
+            <li class="nav-item">
+              <a class="nav-link" href="/dashboard"><%= loginUser.name %></a>
+            </li>
+            <% } else { %>
+            <li class="nav-item">
+              <a class="nav-link" href="/register">Register</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/login">Login</a>
+            </li>
+            <% } %>
+
+            <li class="nav-item">
+              <a class="main-btn" href="/contactus">Contact Us</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Modal -->
+    <div
+      class="modal fade"
+      id="staticBackdrop"
+      tabindex="-1"
+      aria-labelledby="staticBackdropLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel">
+              <img
+                style="width: 70px; height: 40px"
+                src="/static/image/logo.png"
+                alt=""
+              />
+              Your Food Basket.
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body cart-body"></div>
+          <div class="modal-footer">
+            <% if (loginUser) { %>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+            <a
+              href="/user/orderFood"
+              type="button"
+              class="btn btn-primary checkout-btn"
+              >Check out food</a
+            >
+            <% } else { %>
+            <small class="primary-color">Please login to check out food</small>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <section id="/">
+      <div class="container-fluid px-0 top-banner">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-5 col-md-6">
+              <h1>Good Food Choices Are Good Health...</h1>
+              <p>
+                Making informed food choices is fundamental to achieving and
+                maintaining good health. A balanced diet rich in fruits,
+                vegetables, whole grains, lean proteins, and healthy fats
+                supports your body’s essential functions, boosts your immune
+                system, and enhances overall well-being. By selecting nutritious
+                options, you can help prevent chronic diseases, improve mental
+                clarity, and enjoy a higher quality of life.
+              </p>
+
+              <div class="mt-4">
+                <button class="main-btn">
+                  Order now <i class="fas fa-shopping-basket ps-3"></i>
+                </button>
+                <!-- <button class="white-btn">
+                  Order now <i class="fas fa-angle-right ps-3"></i>
+                </button> -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="counter">
+      <section class="counter-section">
+        <div class="container">
+          <div class="row text-center">
+            <div class="col-md-3 mb-lg-0 mb-md-0 mb-5">
+              <h2><span id="count1">4568</span>+</h2>
+              <p>SAVINGS</p>
+            </div>
+            <div class="col-md-3 mb-lg-0 mb-md-0 mb-5">
+              <h2><span id="count2">675</span>+</h2>
+              <p>PHOTOS</p>
+            </div>
+            <div class="col-md-3 mb-lg-0 mb-md-0 mb-5">
+              <h2><span id="count3">567</span>+</h2>
+              <p>FOODS</p>
+            </div>
+            <div class="col-md-3 mb-lg-0 mb-md-0 mb-5">
+              <h2><span id="count4">5673</span>+</h2>
+              <p>CUSTOMERS</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section id="about" class="my-5">
+      <div class="container">
+        <div class="row">
+          <div class="card col-md-7">
+            <img
+              src="/static/image/img/img-1.png"
+              class="img-fluid py-2"
+              alt=""
+            />
+          </div>
+          <div class="col-md-5 mt-md-5 mt-1">
+            <h2>
+              We Pride Ourselves On Making Real Food With The Best Ingredients.
+            </h2>
+            <p>
+              At our core, we are dedicated to crafting meals that not only
+              taste exceptional but also nourish your body. We carefully select
+              only the finest, natural ingredients to ensure every dish we
+              prepare is wholesome and satisfying. Our commitment to quality
+              means we source locally when possible, avoid artificial additives,
+              and prioritize freshness. Each meal is a testament to our passion
+              for real food and our promise to deliver excellence in every bite.
+            </p>
+            <button class="main-btn">Learn More</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="service" class="container">
+      <div class="row">
+        <div class="col-md-5 mt-md-5 pt-md-5">
+          <h2>We Make Everything By Hand With The Best Possible Ingredients</h2>
+          <p>
+            At our kitchen, we believe in the artistry of handcrafting each meal
+            to ensure it meets our high standards. We meticulously select the
+            finest ingredients and prepare each dish with care and precision.
+            Our hands-on approach guarantees that every bite is as delicious and
+            authentic as possible. From farm-fresh vegetables to premium cuts of
+            meat, we focus on quality and flavor in every step of the cooking
+            process.
+          </p>
+          <div class="checks">
+            <span
+              ><i class="fa fa-check"></i> Made with fresh, locally-sourced
+              ingredients.</span
+            ><br />
+            <span
+              ><i class="fa fa-check"></i> Handcrafted for exceptional taste and
+              texture.</span
+            ><br />
+            <span
+              ><i class="fa fa-check"></i> No artificial additives or
+              preservatives.</span
+            >
+          </div>
+          <button class="main-btn">Learn More</button>
+        </div>
+
+        <div class="col-md-7">
+          <img src="/static/image/img/img-2.png" class="img-fluid" alt="" />
+        </div>
+      </div>
+    </section>
+
+    <section id="exploreFood">
+      <section class="container my-5">
+        <div class="text-center mx-md-5 px-md-5">
+          <h2 class="pb-0 mb-3">Explore Our Delicious Offerings</h2>
+          <p>
+            Dive into our diverse menu and discover a world of flavors crafted
+            with passion and precision. From savory entrees to delightful
+            desserts, each dish is prepared with the finest ingredients and
+            innovative recipes. Whether you're seeking a hearty meal or a light
+            snack, we have something to satisfy every palate. Join us in
+            exploring our culinary creations and find your new favorite dish!
+          </p>
+          <button class="main-btn mt-4">Explore Now</button>
+        </div>
+      </section>
+    </section>
+
+    <section id="testimonial" class="my-5">
+      <section class="container">
+        <div class="text-center mb-4">
+          <h2>What Our Clients Are Saying</h2>
+          <p>
+            We value our customers and their feedback. Here’s what some of our
+            happy clients have to say about their experience with us. We strive
+            to provide the best service and delicious food, and we’re thrilled
+            to hear that our efforts are appreciated!
+          </p>
+        </div>
+        <div class="row">
+          <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card text-center p-4">
+              <img
+                src="https://images.pexels.com/photos/3769021/pexels-photo-3769021.jpeg?auto=compress&cs=tinysrgb&w=600"
+                class="rounded-circle mx-auto d-block mb-3"
+                style="width: 100px; height: 100px; object-fit: cover"
+                alt="Customer Photo"
+              />
+              <h5 class="card-title">Alex Johnson</h5>
+              <p class="card-text">
+                “The food was absolutely amazing! Every bite was a delight, and
+                the service was impeccable. Highly recommend to anyone looking
+                for a fantastic dining experience!”
+              </p>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card text-center p-4">
+              <img
+                src="https://images.pexels.com/photos/5920775/pexels-photo-5920775.jpeg?auto=compress&cs=tinysrgb&w=600"
+                class="rounded-circle mx-auto d-block mb-3"
+                style="width: 100px; height: 100px; object-fit: cover"
+                alt="Customer Photo"
+              />
+
+              <h5 class="card-title">Emily Carter</h5>
+              <p class="card-text">
+                “A delightful experience from start to finish. The dishes were
+                expertly prepared and the atmosphere was warm and welcoming.
+                I’ll definitely be back!”
+              </p>
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card text-center p-4">
+              <img
+                src="https://images.pexels.com/photos/4347368/pexels-photo-4347368.jpeg?auto=compress&cs=tinysrgb&w=600"
+                class="rounded-circle mx-auto d-block mb-3"
+                style="width: 100px; height: 100px; object-fit: cover"
+                alt="Customer Photo"
+              />
+              <h5 class="card-title">Michael Lee</h5>
+              <p class="card-text">
+                “Exceptional food and service! Each dish was a testament to
+                their dedication to quality. Highly recommend for anyone wanting
+                to enjoy a great meal.”
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <!-- <section id="contact">
+      <div class="container my-5">
+        <h2 class="text-center mb-4">Contact Us</h2>
+        <form>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="name" class="form-label">Full Name</label>
+                <input type="text" class="form-control" id="name" required />
+              </div>
+              <div class="mb-3">
+                <label for="email" class="form-label">Email address</label>
+                <input type="email" class="form-control" id="email" required />
+              </div>
+              <div class="mb-3">
+                <label for="phone" class="form-label">Phone Number</label>
+                <input type="text" class="form-control" id="phone" required />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="message" class="form-label">Message</label>
+                <textarea
+                  class="form-control"
+                  id="message"
+                  rows="8"
+                  required
+                ></textarea>
+              </div>
+            </div>
+          </div>
+          <button type="submit" class="main-btn">Send Message</button>
+        </form>
+      </div>
+    </section> -->
+
+    <footer class="bg-light py-4">
+      <div class="container text-center">
+        <p>&copy; 2024 Foodies. All Rights Reserved.</p>
+      </div>
+    </footer>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"
+      integrity="sha384-oBqDVmMz4fnFO9gq4vN2C5M17z8O03VcANZZm6O0jc2xDkBto8gE3K76K8gK9laz"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.min.js"
+      integrity="sha384-dV9cZ4LMeWXhu9FYLoPeyk5+2KT03yF6z7+6VGxj4xCST5lQ3v8cmOe4qF0bXlP"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>
