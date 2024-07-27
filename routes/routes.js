@@ -37,8 +37,12 @@ route.post("/loginUser", async (req, res) => {
   console.log("🚀 ~ route.post ~ data:", req.body);
   if (data == null || data == undefined) {
     res.render("login", {
+      loginUser: null,
       invalid: true,
       email: req.body.email,
+      logout: req.session.logout || false,
+      loginFirst: req.session.loginFirst || false,
+      newRegister: req.session.newRegister || false,
     });
   } else {
     req.session.loginUser = data;
@@ -61,24 +65,15 @@ route.get("/logout", (req, res) => {
 });
 
 route.post("/saveRegistration", async (req, res) => {
-  try {
-    const newUser = {
-      ...req.body,
-      profileImage: "https://i.sstatic.net/l60Hf.png",
-    };
-    await User.create(newUser);
-    res.render("login", {
-      newRegister: true,
-      loginUser: req.body,
-      invalid: req.session.invalid || false,
-      logout: req.session.logout || false,
-      loginFirst: req.session.loginFirst || false,
-      newRegister: req.session.newRegister || false,
-    });
-  } catch (error) {
-    console.error("Error saving registration:", error);
-    res.status(500).send("Internal Server Error");
-  }
+  await User.create(req.body);
+  res.render("login", {
+    newRegister: true,
+    loginUser: null,
+    invalid: req.session.invalid || false,
+    logout: req.session.logout || false,
+    loginFirst: req.session.loginFirst || false,
+    newRegister: req.session.newRegister || false,
+  });
 });
 
 route.get("/admin", (req, res) => {
@@ -89,6 +84,7 @@ route.post("/loginAdmin", async (req, res) => {
   const loginUser = await User.findOne({ email: req.body.email });
   if (loginUser.type == "normal") {
     res.render("login", {
+      loginUser: null,
       loginFirst: true,
     });
   } else {
@@ -152,6 +148,7 @@ route.get("/foods/:page", async (req, res) => {
 route.post("/saveRegistration", async (req, res) => {
   const data = await User.create(req.body);
   res.render("login", {
+    loginUser: null,
     newRegister: true,
   });
 });
