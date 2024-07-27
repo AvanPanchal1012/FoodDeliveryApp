@@ -37,8 +37,12 @@ route.post("/loginUser", async (req, res) => {
   console.log("🚀 ~ route.post ~ data:", data);
   if (data == null) {
     res.render("login", {
+      loginUser: null,
       invalid: true,
       email: req.body.email,
+      logout: req.session.logout || false,
+      loginFirst: req.session.loginFirst || false,
+      newRegister: req.session.newRegister || false,
     });
   } else {
     req.session.loginUser = data;
@@ -49,6 +53,7 @@ route.post("/loginUser", async (req, res) => {
 route.get("/logout", (req, res) => {
   req.session.destroy();
   res.render("login", {
+    loginUser: null,
     logout: true,
   });
 });
@@ -57,7 +62,7 @@ route.post("/saveRegistration", async (req, res) => {
   await User.create(req.body);
   res.render("login", {
     newRegister: true,
-    loginUser: req.body,
+    loginUser: null,
     invalid: req.session.invalid || false,
     logout: req.session.logout || false,
     loginFirst: req.session.loginFirst || false,
@@ -73,6 +78,7 @@ route.post("/loginAdmin", async (req, res) => {
   const loginUser = await User.findOne({ email: req.body.email });
   if (loginUser.type == "normal") {
     res.render("login", {
+      loginUser: null,
       loginFirst: true,
     });
   } else {
@@ -136,6 +142,7 @@ route.get("/foods/:page", async (req, res) => {
 route.post("/saveRegistration", async (req, res) => {
   const data = await User.create(req.body);
   res.render("login", {
+    loginUser: null,
     newRegister: true,
   });
 });
