@@ -16,6 +16,7 @@
   </head>
 
   <body>
+    <%- include('partials/navbar', { loginUser: loginUser }) %>
     <main id="contact-page">
       <!-- Banner image -->
       <div class="banner-image">
@@ -36,7 +37,7 @@
           <!-- first column for contact us form -->
           <div class="column-8">
             <div class="form-container">
-              <form action="javascript::" method="post">
+              <form action="/contactus" method="post">
                 <div class="form-field-wrapper">
                   <label class="form-label" for="name">Name</label>
                   <input
@@ -156,5 +157,35 @@
         </div>
       </section>
     </main>
+
+    <script>
+      document
+        .getElementById("contact-form")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
+
+          const formData = {
+            name: document.getElementById("first-name").value,
+            email: document.getElementById("email").value,
+            phone: document.getElementById("phnumber").value,
+            message: document.getElementById("message").value,
+          };
+
+          const response = await fetch("/contactus", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formData),
+          });
+
+          if (response.ok) {
+            alert("Message sent successfully");
+            document.getElementById("contact-form").reset();
+          } else {
+            alert("Failed to send message");
+          }
+        });
+    </script>
   </body>
 </html>
