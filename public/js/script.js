@@ -100,7 +100,7 @@ function updateCart() {
     cart.map((item) => {
       table += `
                <tr>
-                   <td> <img style='width:50px;height:50px;border-radius:50%' src='/static/dishimage/${
+                   <td> <img style='width:50px;height:50px;border-radius:50%' src='/static/image/img/${
                      item.image
                    }'/> </td>
                    <td><small>${item.name}</small></td>

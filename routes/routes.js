@@ -2,7 +2,9 @@ const express = require("express");
 const User = require("../models/User");
 const Dish = require("../models/Dish");
 const Restaurant = require("../models/Restaurant");
+const Contact = require("../models/Contact"); // Import the Contact model
 const route = express.Router();
+const path = require("path");
 
 route.get("/", (req, res) => {
   const loginUser = req.session.loginUser;
@@ -99,9 +101,9 @@ route.get("/dashboard", (req, res) => {
     });
 });
 
-route.get("/contactus", (req, res) => {
-  res.render("contactus");
-});
+// route.get("/contactus", (req, res) => {
+//   res.render("contactus");
+// });
 
 //food page normal user
 route.get("/foods/:page", async (req, res) => {
@@ -245,6 +247,49 @@ route.get("/restaurant/:id", async (req, res) => {
     console.error("Error fetching restaurant or dishes:", error);
     res.status(500).send("Server Error");
   }
+});
+
+// Displays message after successful submission of Contact Us form
+route.get("/message", (req, res) => {
+  const loginUser = req.session.loginUser;
+  res.render("message", {
+    loginUser: loginUser,
+  });
+});
+
+// Render contactus.ejs for contact page
+route.get("/contactus", (req, res) => {
+  const loginUser = req.session.loginUser;
+  console.log("from contactus ~ route.get ~ loginUser:", loginUser);
+  res.render("contactus", {
+    loginUser: loginUser,
+  });
+});
+
+// Handle form submission
+route.post("/contactus", async (req, res) => {
+  try {
+    const loginUser = req.session.loginUser;
+    console.log("🚀 ~ route.get ~ loginUser:", loginUser);
+    const { name, email, phone, message } = req.body;
+    const contact = new Contact({ name, email, phone, message });
+    await contact.save();
+    res.status(200).render("message", {
+      loginUser: loginUser,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Failed to send message");
+  }
+});
+
+// Render aboutus.ejs for about us page
+route.get("/aboutus", (req, res) => {
+  const loginUser = req.session.loginUser;
+  console.log("from about us ~ route.get ~ loginUser:", loginUser);
+  res.render("aboutus", {
+    loginUser: loginUser,
+  });
 });
 
 module.exports = route;
