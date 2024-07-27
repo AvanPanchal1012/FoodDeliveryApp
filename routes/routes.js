@@ -6,6 +6,7 @@ const route = express.Router();
 
 route.get("/", (req, res) => {
   const loginUser = req.session.loginUser;
+  console.log("🚀 ~ route.get ~ loginUser:", loginUser);
   res.render("index", {
     loginUser: loginUser,
   });
@@ -75,6 +76,7 @@ route.post("/loginAdmin", async (req, res) => {
   } else {
     res.render("adminDashboard", {
       loginUser: loginUser,
+      file: `uploads/${req.file.filename}`,
     });
   }
 });
