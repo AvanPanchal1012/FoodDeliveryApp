@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Restaurants</title>
+  </head>
+  <body>
+    <%- include('partials/navbar', { loginUser: loginUser }) %>
+
+    <section class="container-fluid">
+      <div class="container">
+        <form action="/searchRestaurant" method="post">
+          <div class="row search-panel">
+            <div class="col-md-5 offset-md-3 mt-1">
+              <input
+                value="<%= searchKey || '' %>"
+                placeholder="Search restaurant here, Italian Bistro"
+                class="form-control"
+                type="text"
+                name="restaurantSearch"
+              />
+            </div>
+            <div class="col-md-1 text-center mt-1">
+              <button type="submit" class="white-btn2">Search</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="container">
+        <div class="row my-2">
+          <% if (restaurants.length === 0) { %>
+          <p>No restaurants found for "<%= searchKey %>".</p>
+          <% } %> <% restaurants.forEach(function(restaurant) { %>
+          <div class="col-md-4 my-5">
+            <div class="card h-100">
+              <img
+                style="height: 210px"
+                src="/static/image/img/<%= restaurant.photo %>"
+                class="img-fluid mb-2"
+                alt="<%= restaurant.name %>"
+              />
+              <h4><%= restaurant.name %></h4>
+              <p class="text-color">
+                Location: <%= restaurant.location %> | Cuisine: <%=
+                restaurant.cuisine %>
+              </p>
+              <h2 class="primary-color mb-3">
+                Rating: <%= restaurant.rating %>
+              </h2>
+              <p><%= restaurant.description %></p>
+              <a
+                href="/restaurant/<%= restaurant._id %>"
+                class="btn main-btn w-100"
+                >View Details</a
+              >
+            </div>
+          </div>
+          <% }); %>
+        </div>
+
+        <nav aria-label="Page navigation example" class="mt-3 mb-5">
+          <ul class="pagination justify-content-end">
+            <li class="page-item">
+              <a
+                class="page-link <%= currentPage <= 1 ? 'disabled' : '' %>"
+                href="/restaurants/<%= (currentPage - 1) %>?restaurantSearch=<%= searchKey %>"
+                aria-label="Previous"
+              >
+                <span aria-hidden="true">&laquo;</span>
+                <span class="sr-only">Previous</span>
+              </a>
+            </li>
+            <% for(let i = 1; i <= count; i++) { %>
+            <li class="page-item">
+              <a
+                class="page-link"
+                href="/restaurants/<%= i %>?restaurantSearch=<%= searchKey %>"
+                ><%= i %></a
+              >
+            </li>
+            <% } %>
+            <li class="page-item">
+              <a
+                class="page-link <%= currentPage >= count ? 'disabled' : '' %>"
+                href="/restaurants/<%= (currentPage + 1) %>?restaurantSearch=<%= searchKey %>"
+                aria-label="Next"
+              >
+                <span aria-hidden="true">&raquo;</span>
+                <span class="sr-only">Next</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </section>
+  </body>
+</html>

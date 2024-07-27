@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Foodies Foods</title>
+  </head>
+
+  <body>
+    <%- include('partials/navbar', { loginUser: loginUser }) %>
+
+    <section class="container-fluid">
+      <div class="container">
+        <form action="/searchFood" method="post">
+          <div class="row search-panel">
+            <div class="col-md-5 offset-md-3 mt-1">
+              <input
+                value="<%= searchKey || '' %>"
+                placeholder="Search food here, vegetarian burger"
+                class="form-control"
+                type="text"
+                name="foodSearch"
+                id=""
+              />
+            </div>
+            <div class="col-md-1 text-center mt-1">
+              <button type="submit" class="white-btn2">Search</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="container">
+        <div class="row my-2">
+          <% foods.forEach(function(food) { %>
+          <div class="col-md-4 my-5">
+            <div class="card">
+              <img
+                style="height: 210px"
+                src="/static/image/img/<%=food.photo %>"
+                class="img-fluid mb-2"
+                alt="sample"
+              />
+              <h4><%= food.dname %></h4>
+              <p class="text-color">
+                Time : <%= food.dtime %> Minutes | Serve <%= food.dserve %>
+              </p>
+              <h2 class="primary-color mb-3">
+                <i class="fa fa-usd"></i>
+                <% const discountedPrice = food.dprice - (food.dprice *
+                food.ddiscount / 100); %> <%= discountedPrice.toFixed(2) %>
+                <del class="text-muted">
+                  <i class="fa fa-usd"></i><%= food.dprice %>
+                </del>
+              </h2>
+              <div>
+                <button
+                  onclick="addFoodToBasket('<%= food._id %>','<%= food.dname %>','<%= food.dprice %>','<%= food.photo %>' )"
+                  class="main-btn"
+                >
+                  Add To Basket
+                </button>
+              </div>
+            </div>
+          </div>
+          <% }); %>
+        </div>
+
+        <nav aria-label="Page navigation example " class="mt-3 mb-5">
+          <ul class="pagination justify-content-end">
+            <li class="page-item">
+              <a
+                class="page-link"
+                href="/foods/<%= (currentPage - 1) %>"
+                aria-label="Previous"
+              >
+                <span aria-hidden="true">&laquo;</span>
+                <span class="sr-only">Previous</span>
+              </a>
+            </li>
+            <% for(let i = 1; i <= count; i++) { %>
+            <li class="page-item">
+              <a class="page-link" href="/foods/<%= i %>"><%= i %></a>
+            </li>
+            <% } %>
+            <li class="page-item">
+              <a
+                class="page-link"
+                href="/foods/<%= (currentPage + 1) %>"
+                aria-label="Next"
+              >
+                <span aria-hidden="true">&raquo;</span>
+                <span class="sr-only">Next</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <!-- Debugging currentPage -->
+      <div
+        style="
+          position: fixed;
+          top: 0;
+          right: 0;
+          background: rgba(0, 0, 0, 0.8);
+          color: #fff;
+          padding: 10px;
+        "
+      >
+        <strong>Current Page:</strong> <%= currentPage %>
+      </div>
+    </section>
+  </body>
+</html>

@@ -1,5 +1,7 @@
 const express = require("express");
 const User = require("../models/User");
+const Dish = require("../models/Dish");
+const Restaurant = require("../models/Restaurant");
 const route = express.Router();
 
 route.get("/", (req, res) => {
@@ -98,4 +100,149 @@ route.get("/dashboard", (req, res) => {
 route.get("/contactus", (req, res) => {
   res.render("contactus");
 });
+
+//food page normal user
+route.get("/foods/:page", async (req, res) => {
+  const loginUser = req.session.loginUser;
+  let currentPage = parseInt(req.params.page, 10) || 1;
+  const searchKey = req.query.foodSearch || ""; // Get the search key from query params
+
+  const total = 6; // Number of items per page
+  const start = (currentPage - 1) * total;
+
+  // Construct search query
+  const searchQuery = searchKey
+    ? { dname: { $regex: searchKey, $options: "i" } }
+    : {};
+
+  // Fetch foods with search query
+  const foods = await Dish.find(searchQuery).skip(start).limit(total);
+  const count = Math.ceil((await Dish.countDocuments(searchQuery)) / total);
+
+  // console.log("cuurentpage", currentPage);
+  res.render("showDishes", {
+    loginUser,
+    foods,
+    count,
+    currentPage,
+    searchKey, // Pass searchKey to the template
+  });
+});
+
+route.post("/saveRegistration", async (req, res) => {
+  const data = await User.create(req.body);
+  res.render("login", {
+    newRegister: true,
+  });
+});
+
+//search food dish by user
+route.post("/searchFood", async (req, res) => {
+  const loginUser = req.session.loginUser;
+  const search = req.body.foodSearch || "";
+  const currentPage = parseInt(req.query.page, 10) || 1; // Get current page from query parameters
+  const total = 6; // Number of items per page
+  const start = (currentPage - 1) * total;
+
+  // Construct search query
+  const searchQuery = search ? { dname: new RegExp(search, "i") } : {};
+
+  // Fetch foods with search query and pagination
+  const foods = await Dish.find(searchQuery).skip(start).limit(total);
+  const count = Math.ceil((await Dish.countDocuments(searchQuery)) / total);
+
+  res.render("showDishes", {
+    loginUser,
+    foods,
+    count,
+    currentPage,
+    searchKey: search,
+  });
+});
+
+//for restuarants
+// Route to display a list of restaurants with pagination and search
+route.get("/restaurants/:page", async (req, res) => {
+  const loginUser = req.session.loginUser;
+  let currentPage = parseInt(req.params.page, 10) || 1;
+  const searchKey = req.query.restaurantSearch || ""; // Get the search key from query params
+
+  const total = 6; // Number of items per page
+  const start = (currentPage - 1) * total;
+
+  // Construct search query
+  const searchQuery = searchKey
+    ? { name: { $regex: searchKey, $options: "i" } }
+    : {};
+
+  // Fetch restaurants with search query
+  const restaurants = await Restaurant.find(searchQuery)
+    .skip(start)
+    .limit(total);
+  const count = Math.ceil(
+    (await Restaurant.countDocuments(searchQuery)) / total
+  );
+
+  res.render("showRestaurants", {
+    loginUser,
+    restaurants,
+    count,
+    currentPage,
+    searchKey, // Pass searchKey to the template
+  });
+});
+
+route.post("/searchRestaurant", async (req, res) => {
+  const loginUser = req.session.loginUser;
+  const search = req.body.restaurantSearch || "";
+  const currentPage = parseInt(req.query.page, 10) || 1; // Get current page from query parameters
+  const total = 6; // Number of items per page
+  const start = (currentPage - 1) * total;
+
+  // Construct search query
+  const searchQuery = search ? { name: new RegExp(search, "i") } : {};
+
+  // Fetch restaurants with search query and pagination
+  const restaurants = await Restaurant.find(searchQuery)
+    .skip(start)
+    .limit(total);
+  const count = Math.ceil(
+    (await Restaurant.countDocuments(searchQuery)) / total
+  );
+
+  res.render("showRestaurants", {
+    loginUser,
+    restaurants,
+    count,
+    currentPage,
+    searchKey: search,
+  });
+});
+route.get("/restaurant/:id", async (req, res) => {
+  const loginUser = req.session.loginUser;
+  const restaurantId = req.params.id;
+
+  try {
+    // Fetch the restaurant details
+    const restaurant = await Restaurant.findById(restaurantId).populate(
+      "dishIds"
+    );
+    if (!restaurant) {
+      return res.status(404).send("Restaurant not found");
+    }
+
+    // The dishes are already populated within the restaurant object due to the .populate() method
+    const dishes = restaurant.dishIds;
+
+    res.render("restaurantDetail", {
+      loginUser,
+      dishes, // Pass dishes as "dishes" to the template
+      restaurant,
+    });
+  } catch (error) {
+    console.error("Error fetching restaurant or dishes:", error);
+    res.status(500).send("Server Error");
+  }
+});
+
 module.exports = route;
