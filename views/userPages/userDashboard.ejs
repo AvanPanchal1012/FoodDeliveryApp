@@ -28,6 +28,7 @@
     ></script>
     <script src="/static/js/script.js"></script>
   </head>
+
   <body>
     <%- include('../partials/navbar', { loginUser: loginUser }) %>
     <section>
@@ -37,12 +38,10 @@
           <div class="row">
             <div class="col-md-3 offset-md-3">
               <div class="text-center">
-                <img
-                  class="img-fluid"
-                  src="/static/image/review/review-1.jpg"
-                  alt=""
-                />
-                <form
+                <img class="img-fluid" 
+src=<%-loginUser.profileImage%>
+                alt="Profile Image" />
+                <form`
                   action="/upload"
                   method="post"
                   enctype="multipart/form-data"

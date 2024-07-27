@@ -34,35 +34,51 @@ route.get("/login", (req, res) => {
 
 route.post("/loginUser", async (req, res) => {
   const data = await User.findOne({ email: req.body.email });
-  console.log("🚀 ~ route.post ~ data:", data);
-  if (data == null) {
+  console.log("🚀 ~ route.post ~ data:", req.body);
+  if (data == null || data == undefined) {
     res.render("login", {
       invalid: true,
       email: req.body.email,
     });
   } else {
     req.session.loginUser = data;
+    console.log("🚀 ~ route.post ~ req.session.loginUser:", req.session);
     res.redirect("/dashboard");
   }
 });
 
 route.get("/logout", (req, res) => {
-  req.session.destroy();
-  res.render("login", {
-    logout: true,
+  req.session.destroy((err) => {
+    if (err) {
+      console.error("Error destroying session:", err);
+      return res.status(500).send("Internal Server Error");
+    }
+    res.render("login", {
+      logout: true,
+      loginFirst: true,
+    });
   });
 });
 
 route.post("/saveRegistration", async (req, res) => {
-  await User.create(req.body);
-  res.render("login", {
-    newRegister: true,
-    loginUser: req.body,
-    invalid: req.session.invalid || false,
-    logout: req.session.logout || false,
-    loginFirst: req.session.loginFirst || false,
-    newRegister: req.session.newRegister || false,
-  });
+  try {
+    const newUser = {
+      ...req.body,
+      profileImage: "https://i.sstatic.net/l60Hf.png",
+    };
+    await User.create(newUser);
+    res.render("login", {
+      newRegister: true,
+      loginUser: req.body,
+      invalid: req.session.invalid || false,
+      logout: req.session.logout || false,
+      loginFirst: req.session.loginFirst || false,
+      newRegister: req.session.newRegister || false,
+    });
+  } catch (error) {
+    console.error("Error saving registration:", error);
+    res.status(500).send("Internal Server Error");
+  }
 });
 
 route.get("/admin", (req, res) => {

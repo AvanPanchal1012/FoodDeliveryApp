@@ -9,6 +9,7 @@ const UserSchema = new mongoose.Schema({
   password: String,
   address: String,
   type: { type: String, default: "normal" },
+  profileImage: String,
 });
 
 // Encrypt password before saving the user
