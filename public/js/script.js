@@ -69,72 +69,74 @@ function addFoodToBasket(did, dname, dprice, dimage) {
 }
 
 function updateCart() {
-  cart = JSON.parse(localStorage.getItem("cart"));
+  let cart = JSON.parse(localStorage.getItem("cart"));
   if (cart == null || cart.length == 0) {
     $(".cart-num").html("( 0 )");
     $(".cart-body").html("Your cart is empty...");
-    // $(".data").html("Select the Disire product for buy ....");
     $(".order-btn").addClass("disabled");
-    // $(".check-btn2").addClass("d-none");
   } else {
-    $(".cart-num").html(`(  ${cart.length}   )`);
+    $(".cart-num").html(`( ${cart.length} )`);
     $(".order-btn").removeClass("disabled");
-    // $(".check-btn2").removeClass("d-none");
 
-    table = `
-       
+    let table = `
        <table class="table table-hover">
            <tr class="text-style">
-                <th>Pic</th>
+               <th>Pic</th>
                <th>Name</th>
                <th>Price</th>
                <th>Quantity</th>
                <th>Total</th>
                <th>Action</th>
-              
            </tr>
-       
        `;
 
-    var totalPrice = 0;
-    cart.map((item) => {
+    let totalPrice = 0;
+    cart.forEach((item, index) => {
       table += `
                <tr>
-                   <td> <img style='width:50px;height:50px;border-radius:50%' src='/static/image/img/${
-                     item.image
-                   }'/> </td>
+                   <td> <img style='width:50px;height:50px;border-radius:50%' src='/static/image/img/${item.image}'/> </td>
                    <td><small>${item.name}</small></td>
                    <td><small>${item.price}</small></td>
-                   <td><small>${item.quantity}</small></td>
-                   <td><small>${item.price * item.quantity}</small></td>
-                  
                    <td>
-                       <button class="btn btn-danger btn-sm" onclick=" removeBook('${
-                         item.id
-                       }')">Remove</button>
+                       <button class="btn btn-sm btn-danger" onclick="decrementQuantity(${index})">-</button> <small>${item.quantity}</small> <button class="btn btn-sm btn-success" onclick="incrementQuantity(${index})">+</button>
                    </td>
-                  
-                   
+                   <td><small>${item.price * item.quantity}</small></td>
+                   <td>
+                       <button class="btn btn-danger btn-sm" onclick="removeBook(${index})">Remove</button>
+                   </td>
                </tr>
-           
            `;
       totalPrice += item.price * item.quantity;
     });
 
-    table =
-      table +
-      `  
-              <tr>
-              
-                   <td colspan='3' class='my-2 '>Total Price : ${totalPrice} </td>
+    table += `
+               <tr>
+                   <td colspan='5' class='text-right'>Total Price: ${totalPrice}</td>
                </tr>
                </table>
-      
-       
        `;
     $(".cart-body").html(table);
   }
 }
+
+function incrementQuantity(index) {
+  let cart = JSON.parse(localStorage.getItem("cart"));
+  cart[index].quantity += 1;
+  localStorage.setItem("cart", JSON.stringify(cart));
+  updateCart();
+}
+
+function decrementQuantity(index) {
+  let cart = JSON.parse(localStorage.getItem("cart"));
+  if (cart[index].quantity > 1) {
+    cart[index].quantity -= 1;
+  } else {
+    cart.splice(index, 1);
+  }
+  localStorage.setItem("cart", JSON.stringify(cart));
+  updateCart();
+}
+
 function removeBook(did) {
   cart = JSON.parse(localStorage.getItem("cart"));
   updatecart = cart.filter((item) => item.id != did);

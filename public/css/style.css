@@ -284,3 +284,10 @@ p {
 .states-btn {
   width: 100%;
 }
+
+
+.active>.page-link, .page-link.active {
+  background: white;
+  color: #a82b47;
+  border-color:#a82b47 ;
+}

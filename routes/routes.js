@@ -5,6 +5,10 @@ const Restaurant = require("../models/Restaurant");
 const Contact = require("../models/Contact"); // Import the Contact model
 const route = express.Router();
 const path = require("path");
+const multer = require("multer");
+const validate = require("validate.js");
+const UserController = require("../controllers/admin/UserController");
+const LoginController = require("../controllers/admin/LoginController");
 
 route.get("/", (req, res) => {
   const loginUser = req.session.loginUser;
@@ -62,7 +66,10 @@ route.get("/logout", (req, res) => {
     }
     res.render("login", {
       logout: true,
+      loginUser: null,
       loginFirst: true,
+      invalid: false,
+      newRegister: false,
     });
   });
 });
@@ -103,10 +110,6 @@ route.get("/dashboard", (req, res) => {
     console.log("🚀 ~ route.get ~ loginUser:", loginUser);
     if (req.session.loginUser.type == "normal") {
       res.render("userPages/userDashboard", {
-        loginUser: loginUser,
-      });
-    } else if (req.session.loginUser.type == "admin") {
-      res.render("adminDashboard", {
         loginUser: loginUser,
       });
     }
@@ -307,5 +310,57 @@ route.get("/aboutus", (req, res) => {
     loginUser: loginUser,
   });
 });
+
+// --------------------------- ADMIN ROUTES ::: START ---------------------------
+
+async function checkLoginUser(req, res) {
+  return {
+    _id: "66a57266aa51210082fe3581",
+    name: "Jessica Morgan",
+    email: "jessicamorgan@yopmail.com",
+    phone: "1234567890",
+    password: "$2a$10$X/2H3n7Bu9E7hTLHZ6g2V.5XohwTdBWT/5na4Su14wrCX50JQk.0q",
+    address: "Scarborough",
+    type: "admin",
+    __v: 0,
+  };
+  // const loginUser = req.session.loginUser;
+  // console.log(req.session);
+  // if (!loginUser) {
+  //   res.render("adminLogin");
+  // }
+  // else {
+  //   return loginUser;
+  // }
+}
+
+route.get("/admin", LoginController.adminLogin);
+route.post("/loginAdmin", LoginController.handleLogin);
+route.get("/admin/dashboard", LoginController.adminDashboard);
+
+route.get("/admin/users/add", UserController.addNewUser);
+route.post("/admin/users/save", UserController.saveNewUser);
+route.get("/admin/users/:page?", UserController.getAllUsers);
+route.get("/admin/users/edit/:id", UserController.getUserById);
+route.post("/admin/users/update/:id", UserController.updateUser);
+route.get("/admin/users/delete/:id", UserController.deleteUser);
+
+// --------------------------- ADMIN ROUTES ::: END ---------------------------
+
+//--------------------------- ORDERS ROUTES - START ---------------------------
+
+route.get("/user/orderFood", (req, res) => {
+  if (req.session.loginUser) {
+    const loginUser = req.session.loginUser;
+    res.render("userPages/userCheckout", {
+      loginUser: loginUser,
+    });
+  } else {
+    res.render("login", {
+      loginFirst: true,
+    });
+  }
+});
+//--------------------------- ORDERS ROUTES - END ---------------------------
 
 module.exports = route;
