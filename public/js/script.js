@@ -1,9 +1,10 @@
 console.log("script is active");
-function addFoodToBasket(did, dname, dprice, dimage) {
+function addFoodToBasket(rdid,did, dname, dprice, dimage) {
   cart = localStorage.getItem("cart");
   if (cart == null) {
     products = [];
     product = {
+      rid:rdid,
       id: did,
       name: dname,
       price: dprice,
@@ -44,6 +45,7 @@ function addFoodToBasket(did, dname, dprice, dimage) {
       });
     } else {
       p = {
+        rid:rdid,
         id: did,
         name: dname,
         price: dprice,
@@ -137,23 +139,25 @@ function decrementQuantity(index) {
   updateCart();
 }
 
-function removeBook(did) {
-  cart = JSON.parse(localStorage.getItem("cart"));
-  updatecart = cart.filter((item) => item.id != did);
-  n = `${updatecart.length}`;
-  localStorage.setItem("cart", JSON.stringify(updatecart));
-  if (n == 0) {
-    localStorage.removeItem("cart");
-  }
-  updateCart();
-  swal.fire({
-    toast: "true",
-    background: "#fecc0f",
-    html: "<h6 class='text-dark text-small px-1'>Food remove from cart!! </h6>",
-    position: "bottom",
+function removeBook(index) {
+  let cart = JSON.parse(localStorage.getItem("cart"));
+  cart.splice(index, 1);  // Remove the item at the specified index
 
+  if (cart.length === 0) {
+    localStorage.removeItem("cart");
+  } else {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }
+
+  updateCart();
+  
+  Swal.fire({
+    toast: true,
+    background: "#fecc0f",
+    html: "<h6 class='text-dark text-small px-1'>Food removed from cart!!</h6>",
+    position: "bottom",
     showConfirmButton: false,
-    timer: "1000",
+    timer: 1000,
     timerProgressBar: true,
   });
 }
@@ -161,3 +165,7 @@ function removeBook(did) {
 $(document).ready(function () {
   updateCart();
 });
+
+function clearLocalData() {
+  localStorage.clear();
+}

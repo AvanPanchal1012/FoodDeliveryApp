@@ -6,9 +6,10 @@ const mongoose = require("mongoose");
 const session = require("express-session");
 const fileUpload = require("express-fileupload");
 const multer = require("multer");
-
+const path = require("path");
+const User = require("./models/User");
 const app = express();
-app.use(fileUpload());
+// app.use(fileUpload());
 app.use(
   session({
     secret: "secret",
@@ -26,12 +27,12 @@ app.use(
 app.use("", route);
 // Static folder
 app.use("/static", express.static("public"));
+app.use("/uploads", express.static("public/uploads"));
 // Template engine
 app.set("view engine", "ejs");
 app.set("views", "views");
 
-const url =
-  "mongodb+srv://ganganisagar33:qYWLFC9NbHW3bFja@cluster0.jfdipkj.mongodb.net/restaraunt";
+const url = "mongodb+srv://ganganisagar33:qYWLFC9NbHW3bFja@cluster0.jfdipkj.mongodb.net/restaraunt";
 mongoose.connect(url);
 const db = mongoose.connection;
 db.once("open", () => {
@@ -65,6 +66,7 @@ function checkFileType(file, cb) {
   const mimetype = filetypes.test(file.mimetype);
 
   if (mimetype && extname) {
+    console.log("mimetype", mimetype, extname);
     return cb(null, true);
   } else {
     cb("Error: Images Only!");
@@ -77,20 +79,36 @@ app.get("/", (req, res) => {
 });
 
 app.post("/upload", (req, res) => {
-  upload(req, res, (err) => {
+  console.log("🚀 ~ app.post ~ req:", req.session);
+  upload(req, res, async (err) => {
+    const redirectToPage =
+      req.session.loginUser.type == "normal"
+        ? "./userPages/userDashboard"
+        : "./admin/adminDashboard";
     if (err) {
-      res.render("index", {
+      res.render(redirectToPage, {
         msg: err,
+        file: "https://media.sproutsocial.com/uploads/2022/06/profile-picture.jpeg",
+        loginUser: req.session.loginUser,
       });
     } else {
       if (req.file == undefined) {
-        res.render("index", {
+        res.render(redirectToPage, {
           msg: "Error: No File Selected!",
+          file: "https://media.sproutsocial.com/uploads/2022/06/profile-picture.jpeg",
+          loginUser: req.session.loginUser,
         });
       } else {
-        res.render("index", {
+        const user = await User.findOne({
+          email: req.session.loginUser.email,
+        });
+        user.profileImage = `/uploads/${req.file.filename}`;
+        await user.save();
+        req.session.loginUser.profileImage = user.profileImage;
+        res.render(redirectToPage, {
           msg: "File Uploaded!",
           file: `/uploads/${req.file.filename}`,
+          loginUser: req.session.loginUser,
         });
       }
     }

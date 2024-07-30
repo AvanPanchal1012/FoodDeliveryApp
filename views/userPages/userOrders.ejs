@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+      integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"
+      integrity="sha512-aVKKRRi/Q/YV+4mjoKBsE4x3H+BkegoM/em46NNlCqNTmUYADjBbeNefNxYV7giUp0VxICtqdrbqU7iVaeZNXA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script src="/static/js/script.js"></script>
+</head>
+
+<body>
+    <%- include('../partials/navbar', { loginUser: loginUser }) %>
+    <section>
+        <div class="container-fluid pb-5">
+            <%- include('../partials/userBar') %>
+            <div class="container userSection">
+                <div class="text-center mb-1">
+                    <h4><span class="primary-color">FOODIES</span> Current Order.</h4>
+                </div>
+                <div class="row">
+                    <% if (orderFood && orderFood.length > 0) { %>
+                        <% orderFood.forEach(function(order) { %>
+                        <div class="card">
+                            <div class="row">
+                                <div class="col-md-4 offset-md-2">
+                                    <img style="height:200px" src="/static/image/img/<%= order.photo %>" class="img-fluid p-3" alt="">
+                                </div>
+                                <div class="col-md-6 py-3">
+                                    <h5 class="primary-color">Order_id : <%= order._id %></h5>
+                                    <h4>Dish name : <%= order.dname %></h4>
+                                    <h4>Price : <i class="fa fa-usd"></i><%= order.price %></h4>
+                                    <h4>Quantity : <%= order.quantity %></h4>
+                                    <h4>States : <%= order.states %> </h4>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        <% }); %>
+                    <% } else { %>
+                    <div class="text-center my-5">
+                        <h2 class="primary-color">Current order not present...</h2>
+                    </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <% if (cancelOrder) { %>
+    <script>
+        Swal.fire({
+            title: 'Order cancel',
+            text: 'Order is canceled successfully,...',
+            icon: 'success',
+            confirmButtonText: 'Ok!'
+        })
+    </script>
+    <% } %>
+</body>
+
+</html>
