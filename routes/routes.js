@@ -53,6 +53,7 @@ route.post("/loginUser", async (req, res) => {
     console.log("🚀 ~ route.post ~ req.session.loginUser:", req.session);
     if (req.session.loginUser.type == "normal") {
       res.redirect("/dashboard");
+      return;
     }
     res.redirect("/admin");
   }
