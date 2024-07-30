@@ -32,7 +32,7 @@ app.use("/uploads", express.static("public/uploads"));
 app.set("view engine", "ejs");
 app.set("views", "views");
 
-const url = "mongodb://localhost:27017/restaraunt";
+const url = "mongodb+srv://ganganisagar33:qYWLFC9NbHW3bFja@cluster0.jfdipkj.mongodb.net/restaraunt";
 mongoose.connect(url);
 const db = mongoose.connection;
 db.once("open", () => {

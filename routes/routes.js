@@ -66,6 +66,7 @@ route.get("/logout", (req, res) => {
       console.error("Error destroying session:", err);
       return res.status(500).send("Internal Server Error");
     }
+    
     res.render("login", {
       logout: true,
       loginUser: null,
@@ -368,7 +369,6 @@ route.get("/user/orderFood", (req, res) => {
       loginFirst: true,
     });
   }
-<<<<<<< HEAD
 })
 
 
@@ -465,9 +465,6 @@ route.get("/user/orders", async (req, res) => {
       })
   }
 })
-=======
-});
->>>>>>> f1aa7b2081120370f0a49e51003d19e82fff05ed
 //--------------------------- ORDERS ROUTES - END ---------------------------
 
 module.exports = route;

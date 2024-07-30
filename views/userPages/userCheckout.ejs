@@ -38,27 +38,85 @@
 
             <div class="container userSection">
                 <div class="row">
+                    <div class="card">
+                        <h1>Your Orders</h1>
+                    </div>
+                    <div class="card">
+                        <div class="card-body cart-body"></div>
+                        <div id="orderPlaced"></div>
 
-                    <div class="col-md-3">
-                        <h4>Payment type</h4>
-                        <h4 class="text-muted">Cash on delivery : <input type="radio" name="payment" id="offline"></h4>
-                        <h4 class="text-muted">Online payment : <input type="radio" name="payment" id="online"></h4>
+                    </div>
+                    <div class="card col-md-3 p-3">
+                        <h2>Payment type</h2>
+                        <h4 class="text-muted">
+                            Cash on delivery : <input type="radio" name="payment" id="offline" onclick="toggleForms()">
+                        </h4>
+                        <h4 class="text-muted">
+                            Online payment : <input type="radio" name="payment" id="online" onclick="toggleForms()">
+                        </h4>
                     </div>
 
                     <div class="col-md-9">
-                        <div class="card mb-3 px-3">
+                        <div class="card mb-3 px-3 p-3">
                             <h4>Name : <%= loginUser.name %></h4>
                             <h4>Phone number : <%= loginUser.phone %></h4>
                             <h4>Delivery address : <%= loginUser.address %></h4>
                         </div>
-                        <div class="card">
-                            <div class="card-body cart-body"></div>
-                            <div id="orderPlaced"></div>
-
+                        <div id="cashOnDeliveryForm" class="card" style="display:none;">
+                            <div class="card-body">
+                                <h4>Cash on Delivery Information</h4>
+                                <form>
+                                    <div class="mb-3">
+                                        <label for="codName" class="form-label">Name</label>
+                                        <input type="text" class="form-control" id="codName" value="<%= loginUser.name %>">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="codPhone" class="form-label">Phone Number</label>
+                                        <input type="text" class="form-control" id="codPhone" value="<%= loginUser.phone %>">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="codAddress" class="form-label">Address</label>
+                                        <input type="text" class="form-control" id="codAddress" value="<%= loginUser.address %>">
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div id="onlinePaymentForm" class="card" style="display:none;">
+                            <div class="card-body">
+                                <h4>Online Payment Information</h4>
+                                <form>
+                                    <div class="mb-3">
+                                        <label for="onlineName" class="form-label">Name</label>
+                                        <input type="text" class="form-control" id="onlineName" value="<%= loginUser.name %>">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="onlinePhone" class="form-label">Phone Number</label>
+                                        <input type="text" class="form-control" id="onlinePhone" value="<%= loginUser.phone %>">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="onlineAddress" class="form-label">Address</label>
+                                        <input type="text" class="form-control" id="onlineAddress" value="<%= loginUser.address %>">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="cardNumber" class="form-label">Card Number</label>
+                                        <input type="text" class="form-control" id="cardNumber" pattern="\d{16}" title="Card number must be 16 digits" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="expiryDate" class="form-label">Expiry Date</label>
+                                        <input type="text" class="form-control" id="expiryDate" placeholder="MM/YY" pattern="(0[1-9]|1[0-2])\/\d{2}" title="Expiry date must be in MM/YY format" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="cvv" class="form-label">CVV</label>
+                                        <input type="text" class="form-control" id="cvv" pattern="\d{3}" title="CVV must be 3 digits" required>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+    
                             <div class="text-right">
                                 <button onclick="call()" class="main-btn order-btn">Order now !!</button>
                             </div>
-                        </div>
+                        
                     </div>
 
                 </div>
@@ -68,8 +126,10 @@
     </section>
 
     <script>
-        let url = window.location.href;
-        let urlArray = url.split("/");
+        function toggleForms() {
+            document.getElementById('cashOnDeliveryForm').style.display = document.getElementById('offline').checked ? 'block' : 'none';
+            document.getElementById('onlinePaymentForm').style.display = document.getElementById('online').checked ? 'block' : 'none';
+        }
 
         function call() {
             if (localStorage.length != 0) {

@@ -165,3 +165,7 @@ function removeBook(index) {
 $(document).ready(function () {
   updateCart();
 });
+
+function clearLocalData() {
+  localStorage.clear();
+}
