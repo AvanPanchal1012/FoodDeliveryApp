@@ -631,4 +631,21 @@ route.get('/admin/users/delete/:id', async (req, res) => {
 })
 // --------------------------- ADMIN ROUTES ::: END --------------------------- 
 
+
+//--------------------------- ORDERS ROUTES - START ---------------------------
+
+route.get("/user/orderFood", (req, res) => {
+  if (req.session.loginUser) {
+      const loginUser = req.session.loginUser
+      res.render("userPages/userCheckout", {
+          loginUser: loginUser
+      })
+  } else {
+      res.render("login", {
+          loginFirst: true
+      })
+  }
+})
+//--------------------------- ORDERS ROUTES - END ---------------------------
+
 module.exports = route;
