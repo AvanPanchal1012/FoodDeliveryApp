@@ -6,10 +6,10 @@ const Contact = require("../models/Contact");
 const order = require("../models/Order"); // Import the Contact model
 const route = express.Router();
 const path = require("path");
-const multer = require('multer');
-const validate = require('validate.js');
-const UserController = require('../controllers/admin/UserController')
-const LoginController = require('../controllers/admin/LoginController')
+const multer = require("multer");
+const validate = require("validate.js");
+const UserController = require("../controllers/admin/UserController");
+const LoginController = require("../controllers/admin/LoginController");
 
 route.get("/", (req, res) => {
   const loginUser = req.session.loginUser;
@@ -52,7 +52,11 @@ route.post("/loginUser", async (req, res) => {
   } else {
     req.session.loginUser = data;
     console.log("🚀 ~ route.post ~ req.session.loginUser:", req.session);
-    res.redirect("/dashboard");
+    if (req.session.loginUser.type == "normal") {
+      res.redirect("/dashboard");
+      return;
+    }
+    res.send("admin");
   }
 });
 
@@ -65,9 +69,9 @@ route.get("/logout", (req, res) => {
     res.render("login", {
       logout: true,
       loginUser: null,
-      loginFirst: true,
+      loginFirst: false,
       invalid: false,
-      newRegister: false
+      newRegister: false,
     });
   });
 });
@@ -84,6 +88,24 @@ route.post("/saveRegistration", async (req, res) => {
   });
 });
 
+route.get("/admin", (req, res) => {
+  res.render("adminLogin");
+});
+
+route.post("/loginAdmin", async (req, res) => {
+  const loginUser = await User.findOne({ email: req.body.email });
+  if (loginUser.type == "normal") {
+    res.render("login", {
+      loginUser: null,
+      loginFirst: true,
+    });
+  } else {
+    res.render("adminDashboard", {
+      loginUser: loginUser,
+      // file: `uploads/${req.file.filename}`,
+    });
+  }
+});
 route.get("/dashboard", (req, res) => {
   if (req.session.loginUser) {
     const loginUser = req.session.loginUser;
@@ -297,25 +319,24 @@ route.get("/aboutus", (req, res) => {
   });
 });
 
-// --------------------------- ADMIN ROUTES ::: START --------------------------- 
+// --------------------------- ADMIN ROUTES ::: START ---------------------------
 
 async function checkLoginUser(req, res) {
-
   return {
-    _id: '66a57266aa51210082fe3581',
-    name: 'Jessica Morgan',
-    email: 'jessicamorgan@yopmail.com',
-    phone: '1234567890',
-    password: '$2a$10$X/2H3n7Bu9E7hTLHZ6g2V.5XohwTdBWT/5na4Su14wrCX50JQk.0q',
-    address: 'Scarborough',
-    type: 'admin',
-    __v: 0
-  }
+    _id: "66a57266aa51210082fe3581",
+    name: "Jessica Morgan",
+    email: "jessicamorgan@yopmail.com",
+    phone: "1234567890",
+    password: "$2a$10$X/2H3n7Bu9E7hTLHZ6g2V.5XohwTdBWT/5na4Su14wrCX50JQk.0q",
+    address: "Scarborough",
+    type: "admin",
+    __v: 0,
+  };
   // const loginUser = req.session.loginUser;
   // console.log(req.session);
   // if (!loginUser) {
   //   res.render("adminLogin");
-  // } 
+  // }
   // else {
   //   return loginUser;
   // }
@@ -326,28 +347,28 @@ route.post("/loginAdmin", LoginController.handleLogin);
 route.get("/admin/dashboard", LoginController.adminDashboard);
 
 route.get("/admin/users/add", UserController.addNewUser);
-route.post('/admin/users/save', UserController.saveNewUser);
+route.post("/admin/users/save", UserController.saveNewUser);
 route.get("/admin/users/:page?", UserController.getAllUsers);
 route.get("/admin/users/edit/:id", UserController.getUserById);
-route.post('/admin/users/update/:id', UserController.updateUser);
-route.get('/admin/users/delete/:id', UserController.deleteUser)
+route.post("/admin/users/update/:id", UserController.updateUser);
+route.get("/admin/users/delete/:id", UserController.deleteUser);
 
-// --------------------------- ADMIN ROUTES ::: END --------------------------- 
-
+// --------------------------- ADMIN ROUTES ::: END ---------------------------
 
 //--------------------------- ORDERS ROUTES - START ---------------------------
 
 route.get("/user/orderFood", (req, res) => {
   if (req.session.loginUser) {
-      const loginUser = req.session.loginUser
-      res.render("userPages/userCheckout", {
-          loginUser: loginUser
-      })
+    const loginUser = req.session.loginUser;
+    res.render("userPages/userCheckout", {
+      loginUser: loginUser,
+    });
   } else {
-      res.render("login", {
-          loginFirst: true
-      })
+    res.render("login", {
+      loginFirst: true,
+    });
   }
+<<<<<<< HEAD
 })
 
 
@@ -444,6 +465,9 @@ route.get("/user/orders", async (req, res) => {
       })
   }
 })
+=======
+});
+>>>>>>> f1aa7b2081120370f0a49e51003d19e82fff05ed
 //--------------------------- ORDERS ROUTES - END ---------------------------
 
 module.exports = route;
