@@ -11,25 +11,29 @@ const validate = require("validate.js");
 const UserController = require("../controllers/admin/UserController");
 const LoginController = require("../controllers/admin/LoginController");
 
+
+//Index Page
 route.get("/", (req, res) => {
   const loginUser = req.session.loginUser;
-  console.log("🚀 ~ route.get ~ loginUser:", loginUser);
   res.render("index", {
     loginUser: loginUser,
   });
 });
+
+//Register Route
 route.get("/register", (req, res) => {
   const loginUser = req.session.loginUser;
   res.render("registration", {
     loginUser: loginUser,
   });
 });
+//Login Route
 route.get("/login", (req, res) => {
   const loginUser = req.session.loginUser;
-  //   console.log("loginUser:", loginUser);
 
   res.render("login", {
     loginUser: loginUser,
+    loginUser:false,
     invalid: req.session.invalid || false,
     logout: req.session.logout || false,
     loginFirst: req.session.loginFirst || false,
@@ -37,9 +41,9 @@ route.get("/login", (req, res) => {
   });
 });
 
+//Login User Request 
 route.post("/loginUser", async (req, res) => {
   const data = await User.findOne({ email: req.body.email });
-  console.log("🚀 ~ route.post ~ data:", req.body);
   if (data == null || data == undefined) {
     res.render("login", {
       loginUser: null,
@@ -51,7 +55,6 @@ route.post("/loginUser", async (req, res) => {
     });
   } else {
     req.session.loginUser = data;
-    console.log("🚀 ~ route.post ~ req.session.loginUser:", req.session);
     if (req.session.loginUser.type == "normal") {
       res.redirect("/dashboard");
       return;
@@ -60,6 +63,7 @@ route.post("/loginUser", async (req, res) => {
   }
 });
 
+//Logout Request
 route.get("/logout", (req, res) => {
   req.session.destroy((err) => {
     if (err) {
@@ -77,22 +81,34 @@ route.get("/logout", (req, res) => {
   });
 });
 
+//Save Registration Request
 route.post("/saveRegistration", async (req, res) => {
-  await User.create(req.body);
-  res.render("login", {
-    newRegister: true,
-    loginUser: null,
-    invalid: req.session.invalid || false,
-    logout: req.session.logout || false,
-    loginFirst: req.session.loginFirst || false,
-    newRegister: req.session.newRegister || false,
-  });
+  try {
+    const newUser = {
+      ...req.body,
+      profileImage: "https://t3.ftcdn.net/jpg/05/16/27/58/360_F_516275801_f3Fsp17x6HQK0xQgDQEELoTuERO4SsWV.jpg",
+    };
+    await User.create(newUser);
+    res.render("login", {
+      newRegister: true,
+      // loginUser: req.body,
+      loginUser:false,
+      invalid: req.session.invalid || false,
+      logout: req.session.logout || false,
+      loginFirst: req.session.loginFirst || false,
+    });
+  } catch (error) {
+    console.error("Error saving registration:", error);
+    res.status(500).send("Internal Server Error");
+  }
 });
 
+//admin navigate route
 route.get("/admin", (req, res) => {
   res.render("adminLogin");
 });
 
+//admin login route
 route.post("/loginAdmin", async (req, res) => {
   const loginUser = await User.findOne({ email: req.body.email });
   if (loginUser.type == "normal") {
@@ -107,10 +123,11 @@ route.post("/loginAdmin", async (req, res) => {
     });
   }
 });
+
+//displaying dashboard 
 route.get("/dashboard", (req, res) => {
   if (req.session.loginUser) {
     const loginUser = req.session.loginUser;
-    console.log("🚀 ~ route.get ~ loginUser:", loginUser);
     if (req.session.loginUser.type == "normal") {
       res.render("userPages/userDashboard", {
         loginUser: loginUser,
@@ -122,9 +139,6 @@ route.get("/dashboard", (req, res) => {
     });
 });
 
-// route.get("/contactus", (req, res) => {
-//   res.render("contactus");
-// });
 
 //food page normal user
 route.get("/foods/:page", async (req, res) => {
@@ -147,7 +161,6 @@ route.get("/foods/:page", async (req, res) => {
   const restaurants = await Restaurant.find(searchQuery)
   .skip(start)
   .limit(total);
-  // console.log("cuurentpage", currentPage);
   res.render("showDishes", {
     loginUser,
     foods,
@@ -155,14 +168,6 @@ route.get("/foods/:page", async (req, res) => {
     count,
     currentPage,
     searchKey, // Pass searchKey to the template
-  });
-});
-
-route.post("/saveRegistration", async (req, res) => {
-  const data = await User.create(req.body);
-  res.render("login", {
-    loginUser: null,
-    newRegister: true,
   });
 });
 
@@ -288,7 +293,6 @@ route.get("/message", (req, res) => {
 // Render contactus.ejs for contact page
 route.get("/contactus", (req, res) => {
   const loginUser = req.session.loginUser;
-  console.log("from contactus ~ route.get ~ loginUser:", loginUser);
   res.render("contactus", {
     loginUser: loginUser,
   });
@@ -298,7 +302,6 @@ route.get("/contactus", (req, res) => {
 route.post("/contactus", async (req, res) => {
   try {
     const loginUser = req.session.loginUser;
-    console.log("🚀 ~ route.get ~ loginUser:", loginUser);
     const { name, email, phone, message } = req.body;
     const contact = new Contact({ name, email, phone, message });
     await contact.save();
@@ -314,7 +317,6 @@ route.post("/contactus", async (req, res) => {
 // Render aboutus.ejs for about us page
 route.get("/aboutus", (req, res) => {
   const loginUser = req.session.loginUser;
-  console.log("from about us ~ route.get ~ loginUser:", loginUser);
   res.render("aboutus", {
     loginUser: loginUser,
   });
@@ -395,9 +397,7 @@ route.post("/orderNowFromBasket", (req, res) => {
               paymentType: paymentType,
               states: "NA"//not active order
           }
-          console.log(object)
           const data = await order.create(object);
-          console.log(data)
           if (data) {
               console.log('data is save');
           }
@@ -435,7 +435,6 @@ route.get("/user/cancelOrder/:id", async (req, res) => {
 
 
       const data = await order.find({ $and: [{ "states": { $ne: "deliverd" } }, { "userId": req.session.loginUser._id }] });
-      console.log("find data : " + data)
       if (deleteData)
           res.render("userPages/userOrders", {
               loginUser: loginUser,
@@ -453,7 +452,6 @@ route.get("/user/orders", async (req, res) => {
   if (req.session.loginUser) {
       const loginUser = req.session.loginUser;
       const data = await order.find({ $and: [{ "states": { $ne: "deliverd" } }, { "userId": req.session.loginUser._id }] });
-      console.log("find data : " + data)
       res.render("userPages/userOrders", {
           loginUser: loginUser,
           orderFood: data,

@@ -33,6 +33,7 @@ app.set("view engine", "ejs");
 app.set("views", "views");
 
 const url = "mongodb+srv://ganganisagar33:qYWLFC9NbHW3bFja@cluster0.jfdipkj.mongodb.net/restaraunt";
+// const url = "mongodb://localhost:27017/restaurant";
 mongoose.connect(url);
 const db = mongoose.connection;
 db.once("open", () => {
@@ -78,6 +79,8 @@ app.get("/", (req, res) => {
   res.render("index");
 });
 
+
+//uploading/changing user image route
 app.post("/upload", (req, res) => {
   console.log("🚀 ~ app.post ~ req:", req.session);
   upload(req, res, async (err) => {
@@ -115,5 +118,6 @@ app.post("/upload", (req, res) => {
   });
 });
 
+//initializing the port to run on server
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Listening on port ${port}`));
