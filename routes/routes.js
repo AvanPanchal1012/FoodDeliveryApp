@@ -105,11 +105,11 @@ route.post("/saveRegistration", async (req, res) => {
 
 //admin navigate route
 route.get("/admin", (req, res) => {
-  res.render("adminLogin");
+  res.render("./admin/adminLogin");
 });
 
 //admin login route
-route.post("/loginAdmin", async (req, res) => {
+route.post("/adminLogin", async (req, res) => {
   const loginUser = await User.findOne({ email: req.body.email });
   if (loginUser.type == "normal") {
     res.render("login", {
@@ -117,7 +117,7 @@ route.post("/loginAdmin", async (req, res) => {
       loginFirst: true,
     });
   } else {
-    res.render("adminDashboard", {
+    res.render("./admin/adminDashboard", {
       loginUser: loginUser,
       // file: `uploads/${req.file.filename}`,
     });
