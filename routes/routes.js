@@ -53,8 +53,9 @@ route.post("/loginUser", async (req, res) => {
     console.log("🚀 ~ route.post ~ req.session.loginUser:", req.session);
     if (req.session.loginUser.type == "normal") {
       res.redirect("/dashboard");
+      return;
     }
-    res.redirect("/admin");
+    res.send("admin");
   }
 });
 
@@ -67,7 +68,7 @@ route.get("/logout", (req, res) => {
     res.render("login", {
       logout: true,
       loginUser: null,
-      loginFirst: true,
+      loginFirst: false,
       invalid: false,
       newRegister: false,
     });
