@@ -9,13 +9,15 @@ const multer = require("multer");
 const path = require("path");
 const User = require("./models/User");
 const app = express();
-// app.use(fileUpload());
+
+
 app.use(
   session({
     secret: "secret",
+    rolling:true,
     resave: false, // Do not save session if unmodified
     saveUninitialized: true, // Save a new session even if not modified
-    cookie: { secure: false },
+    cookie: { secure: false ,maxAge: 1*60*60*1000},
   })
 );
 app.use(
@@ -40,6 +42,23 @@ db.once("open", () => {
   console.log("Connected to database");
 });
 
+// if User is not authenticated restrict access to certain pages
+function ensureAuthenticated(req, res, next) {
+  if (req.session.loginUser) {
+    // User is authenticated, proceed to the next middleware or route handler
+    return next();
+  } else {
+    // User is not authenticated, restrict access to certain pages
+    const allowedPaths = ["/login", "/register", "/aboutus"];
+    if (allowedPaths.includes(req.path)) {
+      return next(); // Allow access to the permitted pages
+    } else {
+      res.redirect("/login"); // Redirect to login page if not authenticated
+    }
+  }
+}
+
+app.use(ensureAuthenticated);
 // Set storage engine
 const storage = multer.diskStorage({
   destination: "./public/uploads/",
@@ -67,7 +86,6 @@ function checkFileType(file, cb) {
   const mimetype = filetypes.test(file.mimetype);
 
   if (mimetype && extname) {
-    console.log("mimetype", mimetype, extname);
     return cb(null, true);
   } else {
     cb("Error: Images Only!");
@@ -82,7 +100,6 @@ app.get("/", (req, res) => {
 
 //uploading/changing user image route
 app.post("/upload", (req, res) => {
-  console.log("🚀 ~ app.post ~ req:", req.session);
   upload(req, res, async (err) => {
     const redirectToPage =
       req.session.loginUser.type == "normal"
