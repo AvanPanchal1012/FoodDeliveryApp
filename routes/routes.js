@@ -4,11 +4,10 @@ const Dish = require("../models/Dish");
 const Restaurant = require("../models/Restaurant");
 const Contact = require("../models/Contact"); // Import the Contact model
 const route = express.Router();
-const path = require("path");
-const multer = require('multer');
-const validate = require('validate.js');
 const UserController = require('../controllers/admin/UserController')
 const LoginController = require('../controllers/admin/LoginController')
+const ContactUsContoller = require('../controllers/admin/ContactUsContoller')
+const RestaurantController = require('../controllers/admin/RestaurantController')
 
 route.get("/", (req, res) => {
   const loginUser = req.session.loginUser;
@@ -323,7 +322,17 @@ route.post('/admin/users/save', UserController.saveNewUser);
 route.get("/admin/users/:page?", UserController.getAllUsers);
 route.get("/admin/users/edit/:id", UserController.getUserById);
 route.post('/admin/users/update/:id', UserController.updateUser);
-route.get('/admin/users/delete/:id', UserController.deleteUser)
+route.get('/admin/users/delete/:id', UserController.deleteUser);
+
+route.get("/admin/contact-inquiries/:page?", ContactUsContoller.getAllInquiries);
+route.get('/admin/contact-inquiries/delete/:id', ContactUsContoller.deleteInquiry);
+
+route.get("/admin/restaurants/add", RestaurantController.addNewRestaurant);
+route.post('/admin/restaurants/save', RestaurantController.saveNewRestaurant);
+route.get("/admin/restaurants/:page?", RestaurantController.getAllRestaurants);
+route.get("/admin/restaurants/edit/:id", RestaurantController.getRestaurantById);
+route.post('/admin/restaurants/update/:id', RestaurantController.updateRestaurant);
+route.get('/admin/restaurants/delete/:id', RestaurantController.deleteRestaurant);
 
 // --------------------------- ADMIN ROUTES ::: END --------------------------- 
 

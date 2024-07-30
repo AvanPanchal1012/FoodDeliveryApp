@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= !restaurant ? 'Add New Restaurant' : 'Modify Restaurant' %> | Foodie Admin</title>
+</head>
+
+<body>
+    <%- include('../partials/navbar', { loginUser: loginUser }) %>
+
+    <section>
+        <div class="container-fluid">
+            <div class="">
+                <div class="row">
+                    <div class="col-md-3">
+                        <!-- sidebar -->
+                        <%- include('../partials/sidebar') %>
+                    </div>
+                    <div class="col-md-9 ">
+                        <div class="adminPanel card">
+                            <div class="text-center my-1">
+                                <h4><span class="primary-color">FOODIES</span> <%= !restaurant ? 'Add New Restaurant' : 'Modify Restaurant' %> </h4>
+                            </div>
+                            <div class="mb-4 mt-2 mx-2">
+                                <div class="row">
+                                    <div class="col-md-8 offset-md-2 shadow">
+                                        <form action="<%= restaurant && restaurant._id ? '/admin/restaurants/update/' + restaurant._id : '/admin/restaurants/save' %>" method="POST" enctype="multipart/form-data">
+                                            <div class="form-group mb-2">
+                                              <label for="name">Name</label>
+                                              <input type="text" class="form-control" id="name" name="name" value="<%= restaurant?.name %>" >
+                                                <% if (errors && errors.name) { %>
+                                                    <span style="color: red;"><%= errors.name[0] %></span>
+                                                <% } %>
+                                            </div>
+                                            <div class="form-group mb-2">
+                                              <label for="location">Location</label>
+                                              <input type="text" class="form-control" id="location" name="location" value="<%= restaurant?.location %>" >
+                                                <% if (errors && errors.location) { %>
+                                                    <span style="color: red;"><%= errors.location[0] %></span>
+                                                <% } %>
+                                            </div>
+                                            <div class="form-group mb-2">
+                                              <label for="cuisine">Phone</label>
+                                              <input type="text" class="form-control" id="cuisine" name="cuisine" value="<%= restaurant?.cuisine %>" >
+                                              <% if (errors && errors.cuisine) { %>
+                                                <span style="color: red;"><%= errors.cuisine[0] %></span>
+                                            <% } %>
+                                            </div>
+                                            <div class="form-group mb-2">
+                                              <label for="contact">Contact</label>
+                                              <input type="text" class="form-control" id="contact" name="contact" value="<%= restaurant?.contact %>" >
+                                                <% if (errors && errors.contact) { %>
+                                                    <span style="color: red;"><%= errors.contact[0] %></span>
+                                                <% } %>
+                                            </div>
+                                            <div class="form-group mb-2">
+                                                <label for="photo">Photo</label>
+                                                <input type="file" class="form-control-file form-control" id="photo" name="photo">
+                                            </div>
+                                            <div class="form-group mb-2">
+                                                <label for="opening_hours">Opening hours</label>
+                                                <input type="text" class="form-control" id="opening_hours" name="opening_hours">
+                                                <% if (errors && errors.opening_hours) { %>
+                                                    <span style="color: red;"><%= errors.opening_hours[0] %></span>
+                                                <% } %>
+                                            </div>
+                                            <div class="form-group mb-2">
+                                                <label for="text">Description</label>
+                                                <textarea name="description" id="description" class="form-control"></textarea>
+                                                <% if (errors && errors.description) { %>
+                                                    <span style="color: red;"><%= errors.description[0] %></span>
+                                                <% } %>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">Submit</button>
+                                        </form>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+</body>
+
+</html>
+<!-- {{#if save}}
+<script>
+    Swal.fire({
+        title: 'New Dish Added!',
+        text: 'Dish is added to outr menu card...',
+        icon: 'success',
+        confirmButtonText: 'OK'
+    })
+</script>
+{{/if}}
+
+{{#if notsave}}
+<script>
+    Swal.fire({
+        title: 'Something is wrong!',
+        text: 'Please fill the important information. dish is not save to our menu card...',
+        icon: 'error',
+        confirmButtonText: 'Cancel'
+    })
+</script>
+{{/if}} -->

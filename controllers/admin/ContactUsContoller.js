@@ -1,14 +1,4 @@
-const express = require("express");
-const User = require("../models/User");
-const Dish = require("../models/Dish");
-const Restaurant = require("../models/Restaurant");
-const Contact = require("../models/Contact"); // Import the Contact model
-const route = express.Router();
-const path = require("path");
-const multer = require('multer');
-const validate = require('validate.js');
-
-// --------------------------- ADMIN ROUTES ::: START --------------------------- 
+const Contact = require("../../models/Contact");
 
 async function checkLoginUser(req, res) {
 
@@ -22,18 +12,38 @@ async function checkLoginUser(req, res) {
     type: 'admin',
     __v: 0
   }
-  // const loginUser = req.session.loginUser;
-  // console.log(req.session);
-  // if (!loginUser) {
-  //   res.render("adminLogin");
-  // } 
-  // else {
-  //   return loginUser;
-  // }
 }
 
-
-
-// --------------------------- ADMIN ROUTES ::: END --------------------------- 
-
-module.exports = route;
+module.exports = {
+  getAllInquiries: async (req, res) => {
+      const loginUser = await checkLoginUser(req, res);
+      
+      let currentPage = 1;
+      const page = req.params.page;
+      if (page)
+          currentPage = page;
+    
+      const total = 5;
+      const start = (currentPage - 1) * total;
+      const data = await Contact.find().skip(start).limit(total);
+      const totalPage = Math.ceil(await Contact.find().countDocuments() / total);
+      
+      res.render('admin/contactInquiries', {
+          loginUser: loginUser,
+          data: data,
+          currentPage: currentPage,
+          count: totalPage
+      })
+  },
+  deleteInquiry:  async (req, res) => {
+    const loginUser = await checkLoginUser(req, res);
+  
+    const data = await Contact.deleteOne({ "_id": req.params.id })
+    if (data) {
+        console.log("file is deleted...")
+        res.redirect('/admin/contact-inquiries')
+    } else {
+        res.send("<h1>Server Error !!</h1><h2> Sorry, the contact inquiry is not deleted please try letter..</h2>")
+    }
+  }
+}

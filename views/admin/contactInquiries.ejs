@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Inquiries | Foodie Admin</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <style>
+        .created-at-span {
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('../partials/navbar', { loginUser: loginUser }) %>
+
+    <section>
+        <div class="container-fluid">
+            <div class="">
+                <div class="row">
+                    <div class="col-md-3">
+                        <!-- sidebar -->
+                        <%- include('../partials/sidebar') %>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="adminPanel card">
+                            <div class="text-center my-1">
+                                <h4><span class="primary-color">FOODIES</span> Contact Inquiries</h4>
+                            </div>
+                            
+                            <table class="table table-hover table-striped px-md-2">
+                                <thead>
+                                    <td>Name</td>
+                                    <td>Message</td>
+                                    <td>Action</td>
+                                </thead>
+                                <tbody>
+                                    <% data.forEach(item => { %>
+                                        <tr>
+                                            <td><%= item.name %> <br/> <a href="mailto:<%= item.email %>" target="_blank"><%= item.email %></a> <br/> <%= item.phone %> </td>
+                                            <td class="position-relative">
+                                                <%= item.message %>
+                                                <br/>
+                                                <span class="created-at-span text-muted text-right">At <%=new Date(item.createdAt).toLocaleDateString() %></span>
+                                            </td>
+                                            <td> 
+                                                <button onclick="deleteRecord('<%= item._id %>')"
+                                                    class="btn btn-sm btn-danger">Remove</button>
+                                            </td>
+                                        </tr>
+                                    <% }) %>                                    
+                                </tbody>
+                            </table>
+
+                        </div>
+
+                        <nav aria-label="Page navigation example" class="mt-3 mb-5">
+                            <ul class="pagination justify-content-end">
+                                <li class="page-item">
+                                    <a class="page-link <%= currentPage > 1 ? '' : 'disabled' %>"
+                                        href="/admin/contact-inquiries/<%= currentPage > 1 ? currentPage - 1 : '#' %>"
+                                        aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                        <span class="sr-only">Previous</span>
+                                    </a>
+                                </li>
+                                <% for (let i = 1; i <= count; i++) { %>
+                                    <li class="page-item <%= i == currentPage ? 'active' : '' %>">
+                                        <a class="page-link" href="/admin/contact-inquiries/<%= i %>"><%= i %></a>
+                                    </li>
+                                <% } %>
+                                <li class="page-item">
+                                    <a class="page-link <%= currentPage < count ? '' : 'disabled' %>"
+                                        href="/admin/contact-inquiries/<%= currentPage < count ? parseInt(currentPage) + 1 : '#' %>"
+                                        aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                        <span class="sr-only">Next</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+</body>
+<script>
+    
+    function deleteRecord(id) {
+        Swal.fire({
+            title: 'Are you sure delete the inquiry ?',
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: 'Yes',
+            denyButtonText: 'No',
+            customClass: {
+                actions: 'my-actions',
+                cancelButton: 'order-1 right-gap',
+                confirmButton: 'order-2',
+                denyButton: 'order-3',
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                location.assign("http://localhost:3000/admin/contact-inquiries/delete/" + id)
+            } else if (result.isDenied) {
+                Swal.fire('Delete process cancel..', '', 'info')
+            }
+        })
+    }
+
+</script>
+</html>
