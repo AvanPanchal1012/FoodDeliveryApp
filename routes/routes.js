@@ -2,7 +2,8 @@ const express = require("express");
 const User = require("../models/User");
 const Dish = require("../models/Dish");
 const Restaurant = require("../models/Restaurant");
-const Contact = require("../models/Contact"); // Import the Contact model
+const Contact = require("../models/Contact");
+const order = require("../models/Order"); // Import the Contact model
 const route = express.Router();
 const path = require("path");
 const multer = require('multer');
@@ -120,10 +121,14 @@ route.get("/foods/:page", async (req, res) => {
   const foods = await Dish.find(searchQuery).skip(start).limit(total);
   const count = Math.ceil((await Dish.countDocuments(searchQuery)) / total);
 
+  const restaurants = await Restaurant.find(searchQuery)
+  .skip(start)
+  .limit(total);
   // console.log("cuurentpage", currentPage);
   res.render("showDishes", {
     loginUser,
     foods,
+    restaurants,
     count,
     currentPage,
     searchKey, // Pass searchKey to the template
@@ -149,6 +154,7 @@ route.post("/searchFood", async (req, res) => {
   // Construct search query
   const searchQuery = search ? { dname: new RegExp(search, "i") } : {};
 
+
   // Fetch foods with search query and pagination
   const foods = await Dish.find(searchQuery).skip(start).limit(total);
   const count = Math.ceil((await Dish.countDocuments(searchQuery)) / total);
@@ -156,6 +162,7 @@ route.post("/searchFood", async (req, res) => {
   res.render("showDishes", {
     loginUser,
     foods,
+    restaurants,
     count,
     currentPage,
     searchKey: search,
@@ -335,6 +342,101 @@ route.get("/user/orderFood", (req, res) => {
       const loginUser = req.session.loginUser
       res.render("userPages/userCheckout", {
           loginUser: loginUser
+      })
+  } else {
+      res.render("login", {
+          loginFirst: true
+      })
+  }
+})
+
+
+route.post("/orderNowFromBasket", (req, res) => {
+  if (req.session.loginUser) {
+      res.redirect("/")
+      const loginUser = req.session.loginUser;
+      const basket = JSON.parse(req.body.data)
+      let dt_ob = new Date();
+      let dateTime = "" + ("0" + dt_ob.getDate()).slice(-2) + "/" + ("0" + dt_ob.getMonth()).slice(-2) + "/" + dt_ob.getFullYear() + " T " + dt_ob.getHours() + ":" + dt_ob.getMinutes() + ":" + dt_ob.getSeconds();
+      const paymentType = req.body.paymentType
+
+      basket.forEach(async function (item) {
+          let object = {
+              dishId: item.id,
+              userId: loginUser._id,
+              restaurantId: item.rid,
+              user: loginUser,
+              photo: item.image,
+              dname: item.name,
+              time: dateTime,
+              price: item.price,
+              quantity: item.quantity,
+              paymentType: paymentType,
+              states: "NA"//not active order
+          }
+          console.log(object)
+          const data = await order.create(object);
+          console.log(data)
+          if (data) {
+              console.log('data is save');
+          }
+
+      });
+  } else {
+      res.render("login", {
+          loginFirst: true
+      })
+  }
+})
+
+route.get("/user/history", async (req, res) => {
+  if (req.session.loginUser) {
+
+      const loginUser = req.session.loginUser;
+      const data = await order.find({ "userId": req.session.loginUser._id });
+
+
+      res.render("userPages/userHistory", {
+          loginUser: loginUser,
+          history: data
+      })
+  } else {
+      res.render("login", {
+          loginFirst: true
+      })
+  }
+})
+
+route.get("/user/cancelOrder/:id", async (req, res) => {
+  if (req.session.loginUser) {
+      const loginUser = req.session.loginUser;
+      const deleteData = await order.deleteOne({ _id: req.params.id });
+
+
+      const data = await order.find({ $and: [{ "states": { $ne: "deliverd" } }, { "userId": req.session.loginUser._id }] });
+      console.log("find data : " + data)
+      if (deleteData)
+          res.render("userPages/userOrders", {
+              loginUser: loginUser,
+              orderFood: data,
+              cancelOrder: true
+          })
+  } else {
+      res.render("login", {
+          loginFirst: true
+      })
+  }
+})
+
+route.get("/user/orders", async (req, res) => {
+  if (req.session.loginUser) {
+      const loginUser = req.session.loginUser;
+      const data = await order.find({ $and: [{ "states": { $ne: "deliverd" } }, { "userId": req.session.loginUser._id }] });
+      console.log("find data : " + data)
+      res.render("userPages/userOrders", {
+          loginUser: loginUser,
+          orderFood: data,
+          cancelOrder: null
       })
   } else {
       res.render("login", {
