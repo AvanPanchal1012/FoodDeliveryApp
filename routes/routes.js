@@ -47,7 +47,10 @@ route.post("/loginUser", async (req, res) => {
   } else {
     req.session.loginUser = data;
     console.log("🚀 ~ route.post ~ req.session.loginUser:", req.session);
-    res.redirect("/dashboard");
+    if (req.session.loginUser.type == "normal") {
+      res.redirect("/dashboard");
+    }
+    res.redirect("/admin");
   }
 });
 
@@ -90,7 +93,7 @@ route.post("/loginAdmin", async (req, res) => {
   } else {
     res.render("adminDashboard", {
       loginUser: loginUser,
-      file: `uploads/${req.file.filename}`,
+      // file: `uploads/${req.file.filename}`,
     });
   }
 });
