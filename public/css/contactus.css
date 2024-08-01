@@ -1,7 +1,7 @@
 /* Banner image */
 #contact-page .banner-image {
   position: relative;
-  background: url("https://images.pexels.com/photos/1640773/pexels-photo-1640773.jpeg?auto=compress&cs=tinysrgb&w=600");
+  background: url("https://images.pexels.com/photos/1640773/pexels-photo-1640773.jpeg");
   height: 600px;
   background-position: center;
   background-size: cover;

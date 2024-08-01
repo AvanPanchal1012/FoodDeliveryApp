@@ -5,13 +5,12 @@ const Restaurant = require("../models/Restaurant");
 const Contact = require("../models/Contact");
 const order = require("../models/Order"); // Import the Contact model
 const route = express.Router();
-const UserController = require('../controllers/admin/UserController')
-const LoginController = require('../controllers/admin/LoginController')
-const ContactUsContoller = require('../controllers/admin/ContactUsContoller')
-const RestaurantController = require('../controllers/admin/RestaurantController')
-const DishController = require('../controllers/admin/DishController')
-const OrderController = require('../controllers/admin/OrderController')
-
+const UserController = require("../controllers/admin/UserController");
+const LoginController = require("../controllers/admin/LoginController");
+const ContactUsContoller = require("../controllers/admin/ContactUsContoller");
+const RestaurantController = require("../controllers/admin/RestaurantController");
+const DishController = require("../controllers/admin/DishController");
+const OrderController = require("../controllers/admin/OrderController");
 
 //Index Page
 route.get("/", (req, res) => {
@@ -34,7 +33,7 @@ route.get("/login", (req, res) => {
 
   res.render("login", {
     loginUser: loginUser,
-    loginUser:false,
+    loginUser: false,
     invalid: req.session.invalid || false,
     logout: req.session.logout || false,
     loginFirst: req.session.loginFirst || false,
@@ -42,7 +41,7 @@ route.get("/login", (req, res) => {
   });
 });
 
-//Login User Request 
+//Login User Request
 route.post("/loginUser", async (req, res) => {
   const data = await User.findOne({ email: req.body.email });
   if (data == null || data == undefined) {
@@ -71,7 +70,7 @@ route.get("/logout", (req, res) => {
       console.error("Error destroying session:", err);
       return res.status(500).send("Internal Server Error");
     }
-    
+
     res.render("login", {
       logout: true,
       loginUser: null,
@@ -87,13 +86,14 @@ route.post("/saveRegistration", async (req, res) => {
   try {
     const newUser = {
       ...req.body,
-      profileImage: "https://t3.ftcdn.net/jpg/05/16/27/58/360_F_516275801_f3Fsp17x6HQK0xQgDQEELoTuERO4SsWV.jpg",
+      profileImage:
+        "https://t3.ftcdn.net/jpg/05/16/27/58/360_F_516275801_f3Fsp17x6HQK0xQgDQEELoTuERO4SsWV.jpg",
     };
     await User.create(newUser);
     res.render("login", {
       newRegister: true,
       // loginUser: req.body,
-      loginUser:false,
+      loginUser: false,
       invalid: req.session.invalid || false,
       logout: req.session.logout || false,
       loginFirst: req.session.loginFirst || false,
@@ -125,7 +125,7 @@ route.post("/adminLogin", async (req, res) => {
   }
 });
 
-//displaying dashboard 
+//displaying dashboard
 route.get("/dashboard", (req, res) => {
   if (req.session.loginUser) {
     const loginUser = req.session.loginUser;
@@ -139,7 +139,6 @@ route.get("/dashboard", (req, res) => {
       loginFirst: true,
     });
 });
-
 
 //food page normal user
 route.get("/foods/:page", async (req, res) => {
@@ -160,8 +159,8 @@ route.get("/foods/:page", async (req, res) => {
   const count = Math.ceil((await Dish.countDocuments(searchQuery)) / total);
 
   const restaurants = await Restaurant.find(searchQuery)
-  .skip(start)
-  .limit(total);
+    .skip(start)
+    .limit(total);
   res.render("showDishes", {
     loginUser,
     foods,
@@ -182,7 +181,6 @@ route.post("/searchFood", async (req, res) => {
 
   // Construct search query
   const searchQuery = search ? { dname: new RegExp(search, "i") } : {};
-
 
   // Fetch foods with search query and pagination
   const foods = await Dish.find(searchQuery).skip(start).limit(total);
@@ -304,6 +302,7 @@ route.post("/contactus", async (req, res) => {
   try {
     const loginUser = req.session.loginUser;
     const { name, email, phone, message } = req.body;
+    console.log("in contactus", name, email, phone, message);
     const contact = new Contact({ name, email, phone, message });
     await contact.save();
     res.status(200).render("message", {
@@ -311,7 +310,7 @@ route.post("/contactus", async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).send("Failed to send message");
+    res.status(500).send("Please enter your details properly, and try again!!");
   }
 });
 
@@ -354,25 +353,40 @@ route.get("/admin/users/add", UserController.addNewUser);
 route.post("/admin/users/save", UserController.saveNewUser);
 route.get("/admin/users/:page?", UserController.getAllUsers);
 route.get("/admin/users/edit/:id", UserController.getUserById);
-route.post('/admin/users/update/:id', UserController.updateUser);
-route.get('/admin/users/delete/:id', UserController.deleteUser);
+route.post("/admin/users/update/:id", UserController.updateUser);
+route.get("/admin/users/delete/:id", UserController.deleteUser);
 
-route.get("/admin/contact-inquiries/:page?", ContactUsContoller.getAllInquiries);
-route.get('/admin/contact-inquiries/delete/:id', ContactUsContoller.deleteInquiry);
+route.get(
+  "/admin/contact-inquiries/:page?",
+  ContactUsContoller.getAllInquiries
+);
+route.get(
+  "/admin/contact-inquiries/delete/:id",
+  ContactUsContoller.deleteInquiry
+);
 
 route.get("/admin/restaurants/add", RestaurantController.addNewRestaurant);
-route.post('/admin/restaurants/save', RestaurantController.saveNewRestaurant);
+route.post("/admin/restaurants/save", RestaurantController.saveNewRestaurant);
 route.get("/admin/restaurants/:page?", RestaurantController.getAllRestaurants);
-route.get("/admin/restaurants/edit/:id", RestaurantController.getRestaurantById);
-route.post('/admin/restaurants/update/:id', RestaurantController.updateRestaurant);
-route.get('/admin/restaurants/delete/:id', RestaurantController.deleteRestaurant);
+route.get(
+  "/admin/restaurants/edit/:id",
+  RestaurantController.getRestaurantById
+);
+route.post(
+  "/admin/restaurants/update/:id",
+  RestaurantController.updateRestaurant
+);
+route.get(
+  "/admin/restaurants/delete/:id",
+  RestaurantController.deleteRestaurant
+);
 
 route.get("/admin/dishes/add", DishController.addNewDish);
-route.post('/admin/dishes/save', DishController.saveNewDish);
+route.post("/admin/dishes/save", DishController.saveNewDish);
 route.get("/admin/dishes/:page?", DishController.getAllDishes);
 route.get("/admin/dishes/edit/:id", DishController.getDishById);
-route.post('/admin/dishes/update/:id', DishController.updateDish);
-route.get('/admin/dishes/delete/:id', DishController.deleteDish);
+route.post("/admin/dishes/update/:id", DishController.updateDish);
+route.get("/admin/dishes/delete/:id", DishController.deleteDish);
 
 //ORDERS
 route.get("/admin/orders/:page?", OrderController.getAllOrders);
@@ -395,98 +409,115 @@ route.get("/user/orderFood", (req, res) => {
       loginFirst: true,
     });
   }
-})
-
+});
 
 route.post("/orderNowFromBasket", (req, res) => {
   if (req.session.loginUser) {
-      res.redirect("/")
-      const loginUser = req.session.loginUser;
-      const basket = JSON.parse(req.body.data)
-      let dt_ob = new Date();
-      let dateTime = "" + ("0" + dt_ob.getDate()).slice(-2) + "/" + ("0" + dt_ob.getMonth()).slice(-2) + "/" + dt_ob.getFullYear() + " T " + dt_ob.getHours() + ":" + dt_ob.getMinutes() + ":" + dt_ob.getSeconds();
-      const paymentType = req.body.paymentType
+    res.redirect("/");
+    const loginUser = req.session.loginUser;
+    const basket = JSON.parse(req.body.data);
+    let dt_ob = new Date();
+    let dateTime =
+      "" +
+      ("0" + dt_ob.getDate()).slice(-2) +
+      "/" +
+      ("0" + dt_ob.getMonth()).slice(-2) +
+      "/" +
+      dt_ob.getFullYear() +
+      " T " +
+      dt_ob.getHours() +
+      ":" +
+      dt_ob.getMinutes() +
+      ":" +
+      dt_ob.getSeconds();
+    const paymentType = req.body.paymentType;
 
-      basket.forEach(async function (item) {
-          let object = {
-              dishId: item.id,
-              userId: loginUser._id,
-              restaurantId: item.rid,
-              user: loginUser,
-              photo: item.image,
-              dname: item.name,
-              time: dateTime,
-              price: item.price,
-              quantity: item.quantity,
-              paymentType: paymentType,
-              states: "NA"//not active order
-          }
-          const data = await order.create(object);
-          if (data) {
-              console.log('data is save');
-          }
-
-      });
+    basket.forEach(async function (item) {
+      let object = {
+        dishId: item.id,
+        userId: loginUser._id,
+        restaurantId: item.rid,
+        user: loginUser,
+        photo: item.image,
+        dname: item.name,
+        time: dateTime,
+        price: item.price,
+        quantity: item.quantity,
+        paymentType: paymentType,
+        states: "NA", //not active order
+      };
+      const data = await order.create(object);
+      if (data) {
+        console.log("data is save");
+      }
+    });
   } else {
-      res.render("login", {
-          loginFirst: true
-      })
+    res.render("login", {
+      loginFirst: true,
+    });
   }
-})
+});
 
 route.get("/user/history", async (req, res) => {
   if (req.session.loginUser) {
+    const loginUser = req.session.loginUser;
+    const data = await order.find({ userId: req.session.loginUser._id });
 
-      const loginUser = req.session.loginUser;
-      const data = await order.find({ "userId": req.session.loginUser._id });
-
-
-      res.render("userPages/userHistory", {
-          loginUser: loginUser,
-          history: data
-      })
+    res.render("userPages/userHistory", {
+      loginUser: loginUser,
+      history: data,
+    });
   } else {
-      res.render("login", {
-          loginFirst: true
-      })
+    res.render("login", {
+      loginFirst: true,
+    });
   }
-})
+});
 
 route.get("/user/cancelOrder/:id", async (req, res) => {
   if (req.session.loginUser) {
-      const loginUser = req.session.loginUser;
-      const deleteData = await order.deleteOne({ _id: req.params.id });
+    const loginUser = req.session.loginUser;
+    const deleteData = await order.deleteOne({ _id: req.params.id });
 
-
-      const data = await order.find({ $and: [{ "states": { $ne: "deliverd" } }, { "userId": req.session.loginUser._id }] });
-      if (deleteData)
-          res.render("userPages/userOrders", {
-              loginUser: loginUser,
-              orderFood: data,
-              cancelOrder: true
-          })
+    const data = await order.find({
+      $and: [
+        { states: { $ne: "deliverd" } },
+        { userId: req.session.loginUser._id },
+      ],
+    });
+    if (deleteData)
+      res.render("userPages/userOrders", {
+        loginUser: loginUser,
+        orderFood: data,
+        cancelOrder: true,
+      });
   } else {
-      res.render("login", {
-          loginFirst: true
-      })
+    res.render("login", {
+      loginFirst: true,
+    });
   }
-})
+});
 
 route.get("/user/orders", async (req, res) => {
   if (req.session.loginUser) {
-      const loginUser = req.session.loginUser;
-      const data = await order.find({ $and: [{ "states": { $ne: "deliverd" } }, { "userId": req.session.loginUser._id }] });
-      res.render("userPages/userOrders", {
-          loginUser: loginUser,
-          orderFood: data,
-          cancelOrder: null
-      })
+    const loginUser = req.session.loginUser;
+    const data = await order.find({
+      $and: [
+        { states: { $ne: "deliverd" } },
+        { userId: req.session.loginUser._id },
+      ],
+    });
+    res.render("userPages/userOrders", {
+      loginUser: loginUser,
+      orderFood: data,
+      cancelOrder: null,
+    });
   } else {
-      res.render("login", {
-          loginFirst: true
-      })
+    res.render("login", {
+      loginFirst: true,
+    });
   }
-})
+});
 //--------------------------- ORDERS ROUTES - END ---------------------------
 
 module.exports = route;

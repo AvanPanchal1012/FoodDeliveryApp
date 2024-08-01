@@ -18,13 +18,10 @@
   <body>
     <%- include('partials/navbar', { loginUser: loginUser }) %>
     <main id="contact-page">
-      <!-- Banner image -->
       <div class="banner-image">
-        <!-- Overlay to give faded effect -->
         <div class="overlay"></div>
       </div>
 
-      <!-- Contact us section starts here -->
       <section class="container">
         <h1 class="sub-heading">Reach out to us</h1>
         <p>
@@ -32,40 +29,47 @@
           touch today by filling in your details below.
         </p>
 
-        <!-- Two column layout  -->
         <div class="row">
-          <!-- first column for contact us form -->
           <div class="column-8">
             <div class="form-container">
-              <form action="/contactus" method="post">
+              <form id="contact-form" action="/contactus" method="post">
                 <div class="form-field-wrapper">
                   <label class="form-label" for="name">Name</label>
                   <input
                     class="form-field"
+                    id="name"
                     placeholder="Enter Name"
-                    value=""
                     type="text"
                     name="name"
+                    required
+                    minlength="2"
+                    maxlength="50"
+                    pattern="[A-Za-z ]+"
+                    title="Name should only contain letters."
                   />
                 </div>
                 <div class="form-field-wrapper">
                   <label class="form-label" for="email">Email Address</label>
                   <input
                     class="form-field"
+                    id="email"
                     placeholder="Enter Email"
-                    value=""
-                    type="text"
+                    type="email"
                     name="email"
+                    required
                   />
                 </div>
                 <div class="form-field-wrapper">
-                  <label class="form-label" for="phnumber">Phone Number</label>
+                  <label class="form-label" for="phone">Phone Number</label>
                   <input
                     class="form-field"
+                    id="phone"
                     placeholder="Enter phone number"
-                    value=""
-                    type="text"
+                    type="tel"
                     name="phone"
+                    required
+                    pattern="^\d{10}$"
+                    title="Phone number must be 10 digits."
                   />
                 </div>
 
@@ -73,8 +77,12 @@
                   <label class="form-label" for="message">Message</label>
                   <textarea
                     class="form-field"
+                    id="message"
                     placeholder="Enter message"
                     name="message"
+                    required
+                    minlength="10"
+                    maxlength="500"
                   ></textarea>
                 </div>
 
@@ -85,12 +93,10 @@
             </div>
           </div>
 
-          <!-- second column for contact us options -->
           <div class="column-4">
             <div class="row">
               <div class="module icon-card">
                 <div class="icon-card-icon">
-                  <!-- <i class="fa fa-map-marker"></i> -->
                   <i class="fas fa-map-marker-alt" style="color: #a82c48"></i>
                 </div>
                 <div class="icon-card-title-caption">
@@ -116,7 +122,6 @@
             <div class="row">
               <div class="module icon-card">
                 <div class="icon-card-icon">
-                  <!-- <i class="fa fa-mobile-phone icon"> </i> -->
                   <i class="fas fa-mobile" style="color: #a82c48"></i>
                 </div>
                 <div class="icon-card-title-caption">
@@ -134,7 +139,6 @@
             <div class="row">
               <div class="module icon-card">
                 <div class="icon-card-icon">
-                  <!-- <i class="fa fa-envelope icon icon-email"> </i> -->
                   <i class="fas fa-envelope" style="color: #a82c48"></i>
                 </div>
                 <div class="icon-card-title-caption">
@@ -157,35 +161,5 @@
         </div>
       </section>
     </main>
-
-    <script>
-      document
-        .getElementById("contact-form")
-        .addEventListener("submit", async function (event) {
-          event.preventDefault();
-
-          const formData = {
-            name: document.getElementById("first-name").value,
-            email: document.getElementById("email").value,
-            phone: document.getElementById("phnumber").value,
-            message: document.getElementById("message").value,
-          };
-
-          const response = await fetch("/contactus", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(formData),
-          });
-
-          if (response.ok) {
-            alert("Message sent successfully");
-            document.getElementById("contact-form").reset();
-          } else {
-            alert("Failed to send message");
-          }
-        });
-    </script>
   </body>
 </html>
