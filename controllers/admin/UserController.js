@@ -2,42 +2,27 @@ const User = require("../../models/User");
 const validate = require('validate.js');
 const validationObj = require('../../validations/admin/UserValidations');
 const upload = require('../../helpers/UploadHelper');
-
-async function checkLoginUser(req, res) {
-
-  return {
-    _id: '66a57266aa51210082fe3581',
-    name: 'Jessica Morgan',
-    email: 'jessicamorgan@yopmail.com',
-    phone: '1234567890',
-    password: '$2a$10$X/2H3n7Bu9E7hTLHZ6g2V.5XohwTdBWT/5na4Su14wrCX50JQk.0q',
-    address: 'Scarborough',
-    type: 'admin',
-    __v: 0
-  }
-  // const loginUser = req.session.loginUser;
-  // console.log(req.session);
-  // if (!loginUser) {
-  //   res.render("adminLogin");
-  // } 
-  // else {
-  //   return loginUser;
-  // }
-}
+const checkLoginSession = require("../../helpers/checkLoginSession");
 
 module.exports = {
     addNewUser: async (req, res) => {
-        const loginUser = await checkLoginUser(req, res);
+      const loginUser = await checkLoginSession(req, res);
       
+      if (loginUser) {
         res.render('admin/adminUserAdd', {
             loginUser: loginUser,
             errors: null,
             user: null
         })
+      }
+      else {
+        res.redirect("/admin");
+      }
     },
     saveNewUser: async (req, res) => {
-        const loginUser = await checkLoginUser(req, res);
+      const loginUser = await checkLoginSession(req, res);
     
+      if (loginUser) {
         upload(req, res, async (err) => {
           if (err) {
             res.render("admin/adminUserAdd", {
@@ -99,11 +84,15 @@ module.exports = {
               }
           }
         });
-
+      }
+      else {
+        res.redirect("/admin");
+      }
     },
     getAllUsers: async (req, res) => {
-        const loginUser = await checkLoginUser(req, res);
-        
+      const loginUser = await checkLoginSession(req, res);
+      
+      if (loginUser) {
         let currentPage = 1;
         const page = req.params.page;
         if (page)
@@ -120,10 +109,15 @@ module.exports = {
             currentPage: currentPage,
             count: totalPage
         })
+      }
+      else {
+        res.redirect("/admin");
+      }
     },
     getUserById: async (req, res) => {
-        const loginUser = await checkLoginUser(req, res);
-      
+      const loginUser = await checkLoginSession(req, res);
+    
+      if (loginUser) {
         const data = await User.findOne({_id: req.params.id, type : {$ne: 'admin'}})
         console.log(data);
         if (data) {
@@ -135,11 +129,16 @@ module.exports = {
         } else {
           res.redirect('admin/users')
         }
+      }
+      else {
+        res.redirect("/admin");
+      }
     },
     updateUser: async (req, res) => {
-        const loginUser = await checkLoginUser(req, res);
-        const userId = req.params.id;
+      const loginUser = await checkLoginSession(req, res);
+      const userId = req.params.id;
     
+      if (loginUser) {
         upload(req, res, async (err) => {
           if (err) {
             res.render("admin/adminUserAdd", {
@@ -172,7 +171,7 @@ module.exports = {
         
               // Query to check if email exists
               const emailExist = await User.findOne({ email: email, _id: {$ne: userId}});
-        
+              console.log(emailExist);
               if (emailExist) {
                 res.render("admin/adminUserAdd", {
                   user: {
@@ -207,10 +206,15 @@ module.exports = {
             }
           }
         });
+      }
+      else {
+        res.redirect("/admin");
+      }
     },
     deleteUser: async (req, res) => {
-        const loginUser = await checkLoginUser(req, res);
-      
+      const loginUser = await checkLoginSession(req, res);
+    
+      if (loginUser) {
         const data = await User.deleteOne({ "_id": req.params.id })
         if (data) {
             console.log("file is deleted...")
@@ -218,5 +222,9 @@ module.exports = {
         } else {
             res.send("<h1>Server Error !!</h1><h2> Sorry user is not deleted please try letter..</h2>")
         }
+      }
+      else {
+        res.redirect("/admin");
+      }
     }
 }

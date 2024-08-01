@@ -104,27 +104,6 @@ route.post("/saveRegistration", async (req, res) => {
   }
 });
 
-//admin navigate route
-route.get("/admin", (req, res) => {
-  res.render("./admin/adminLogin");
-});
-
-//admin login route
-route.post("/adminLogin", async (req, res) => {
-  const loginUser = await User.findOne({ email: req.body.email });
-  if (loginUser.type == "normal") {
-    res.render("login", {
-      loginUser: null,
-      loginFirst: true,
-    });
-  } else {
-    res.render("./admin/adminDashboard", {
-      loginUser: loginUser,
-      // file: `uploads/${req.file.filename}`,
-    });
-  }
-});
-
 //displaying dashboard
 route.get("/dashboard", (req, res) => {
   if (req.session.loginUser) {
@@ -133,6 +112,9 @@ route.get("/dashboard", (req, res) => {
       res.render("userPages/userDashboard", {
         loginUser: loginUser,
       });
+    }
+    else {
+      res.redirect('admin/dashboard')
     }
   } else
     res.render("login", {
@@ -323,27 +305,6 @@ route.get("/aboutus", (req, res) => {
 });
 
 // --------------------------- ADMIN ROUTES ::: START ---------------------------
-
-async function checkLoginUser(req, res) {
-  return {
-    _id: "66a57266aa51210082fe3581",
-    name: "Jessica Morgan",
-    email: "jessicamorgan@yopmail.com",
-    phone: "1234567890",
-    password: "$2a$10$X/2H3n7Bu9E7hTLHZ6g2V.5XohwTdBWT/5na4Su14wrCX50JQk.0q",
-    address: "Scarborough",
-    type: "admin",
-    __v: 0,
-  };
-  // const loginUser = req.session.loginUser;
-  // console.log(req.session);
-  // if (!loginUser) {
-  //   res.render("adminLogin");
-  // }
-  // else {
-  //   return loginUser;
-  // }
-}
 
 route.get("/admin", LoginController.adminLogin);
 route.post("/loginAdmin", LoginController.handleLogin);
