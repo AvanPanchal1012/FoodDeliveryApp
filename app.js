@@ -6,16 +6,18 @@ const mongoose = require("mongoose");
 const session = require("express-session");
 const fileUpload = require("express-fileupload");
 const multer = require("multer");
+const path = require("path");
 const User = require("./models/User");
-
 const app = express();
-app.use(fileUpload());
+
+
 app.use(
   session({
     secret: "secret",
+    rolling:true,
     resave: false, // Do not save session if unmodified
     saveUninitialized: true, // Save a new session even if not modified
-    cookie: { secure: false },
+    cookie: { secure: false ,maxAge: 1*60*60*1000},
   })
 );
 app.use(
@@ -27,6 +29,7 @@ app.use(
 app.use("", route);
 // Static folder
 app.use("/static", express.static("public"));
+app.use("/uploads", express.static("public/uploads"));
 // Template engine
 app.set("view engine", "ejs");
 app.set("views", "views");
@@ -38,6 +41,23 @@ db.once("open", () => {
   console.log("Connected to database");
 });
 
+// if User is not authenticated restrict access to certain pages
+function ensureAuthenticated(req, res, next) {
+  if (req.session.loginUser) {
+    // User is authenticated, proceed to the next middleware or route handler
+    return next();
+  } else {
+    // User is not authenticated, restrict access to certain pages
+    const allowedPaths = ["/login", "/register", "/aboutus"];
+    if (allowedPaths.includes(req.path)) {
+      return next(); // Allow access to the permitted pages
+    } else {
+      res.redirect("/login"); // Redirect to login page if not authenticated
+    }
+  }
+}
+
+app.use(ensureAuthenticated);
 // Set storage engine
 const storage = multer.diskStorage({
   destination: "./public/uploads/",
@@ -72,53 +92,48 @@ function checkFileType(file, cb) {
 }
 
 // Render the main page
-// app.get("/", (req, res) => {
-//   res.render("index");
-// });
+app.get("/", (req, res) => {
+  res.render("index");
+});
 
-app.post("/upload", async (req, res) => {
-  const loginUser = req.session.loginUser;
-  console.log("🚀 ~ app.post ~ loginUser:", req.session);
-  upload(req, res, (err) => {
+
+//uploading/changing user image route
+app.post("/upload", (req, res) => {
+  upload(req, res, async (err) => {
+    const redirectToPage =
+      req.session.loginUser.type == "normal"
+        ? "./userPages/userDashboard"
+        : "./admin/adminDashboard";
     if (err) {
-      console.log("in the if part");
-      res.render("userPages/userDashboard", {
+      res.render(redirectToPage, {
         msg: err,
-        loginUser: loginUser,
+        file: "https://media.sproutsocial.com/uploads/2022/06/profile-picture.jpeg",
+        loginUser: req.session.loginUser,
       });
     } else {
       if (req.file == undefined) {
-        res.render("userPages/userDashboard", {
+        res.render(redirectToPage, {
           msg: "Error: No File Selected!",
-          loginUser: loginUser,
+          file: "https://media.sproutsocial.com/uploads/2022/06/profile-picture.jpeg",
+          loginUser: req.session.loginUser,
         });
       } else {
-        console.log("in the else part");
-        const imageUrl = `/uploads/${req.file.filename}`;
-        const email = req.session.loginUser.email;
-
-        User.findOneAndUpdate(
-          { email: email },
-          {
-            profileImage: imageUrl,
-          }
-        );
-        loginUser.profileImage = imageUrl;
-        req.session.loginUser = loginUser; // Save updated user to session
-        res.render("userPages/userDashboard", {
-          msg: "File Uploaded!",
-          loginUser: loginUser,
-          file: imageUrl,
+        const user = await User.findOne({
+          email: req.session.loginUser.email,
         });
-        res.render("userPages/userDashboard", {
+        user.profileImage = `/uploads/${req.file.filename}`;
+        await user.save();
+        req.session.loginUser.profileImage = user.profileImage;
+        res.render(redirectToPage, {
           msg: "File Uploaded!",
-          loginUser: loginUser,
           file: `/uploads/${req.file.filename}`,
+          loginUser: req.session.loginUser,
         });
       }
     }
   });
 });
 
+//initializing the port to run on server
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Listening on port ${port}`));
