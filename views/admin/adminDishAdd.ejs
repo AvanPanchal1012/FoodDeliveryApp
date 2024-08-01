@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= !dish ? 'Add New Dish' : 'Modify Dish' %> | Foodie Admin</title>
+</head>
+
+<body>
+    <%- include('../partials/navbar', { loginUser: loginUser }) %>
+
+    <section>
+        <div class="container-fluid">
+            <div class="">
+                <div class="row">
+                    <div class="col-md-3">
+                        <!-- sidebar -->
+                        <%- include('../partials/sidebar') %>
+                    </div>
+                    <div class="col-md-9 ">
+                        <div class="adminPanel card">
+                            <div class="text-center my-1">
+                                <h4><span class="primary-color">FOODIES</span> <%= !dish ? 'Add New Dish' : 'Modify Dish' %> </h4>
+                            </div>
+                            <div class="mb-4 mt-2 mx-2">
+                                <div class="row">
+                                    <div class="col-md-8 offset-md-2 shadow">
+                                        <form action="<%= dish && dish._id ? '/admin/dishes/update/' + dish._id : '/admin/dishes/save' %>" method="POST" enctype="multipart/form-data">
+                                            <div class="form-group mb-2">
+                                              <label for="name">Dish name</label>
+                                              <input type="text" class="form-control" id="name" name="name" value="<%= dish?.name %>" >
+                                                <% if (errors && errors.name) { %>
+                                                    <span style="color: red;"><%= errors.name[0] %></span>
+                                                <% } %>
+                                            </div>
+                                            <div class="form-group mb-2">
+                                              <label for="type">Type</label>
+                                              <input type="text" class="form-control" id="type" name="type" value="<%= dish?.type %>" >
+                                                <% if (errors && errors.type) { %>
+                                                    <span style="color: red;"><%= errors.type[0] %></span>
+                                                <% } %>
+                                            </div>
+                                            <div class="form-group mb-2">
+                                                <label for="price">Price</label>
+                                                <input type="text" class="form-control" id="price" name="price" value="<%= dish?.price %>" >
+                                                <% if (errors && errors.price) { %>
+                                                  <span style="color: red;"><%= errors.price[0] %></span>
+                                              <% } %>
+                                            </div>
+                                            <div class="form-group mb-2">
+                                              <label for="time">Preparation Time</label>
+                                              <input type="text" class="form-control" id="time" name="time" value="<%= dish?.time %>" >
+                                                <% if (errors && errors.time) { %>
+                                                    <span style="color: red;"><%= errors.time[0] %></span>
+                                                <% } %>
+                                            </div>
+                                            <div class="form-group mb-2">
+                                                <label for="photo">Photo</label>
+                                                <input type="file" class="form-control-file form-control" id="photo" name="photo">
+                                            </div>
+                                            <div class="form-group mb-2">
+                                                <label for="discount">Discount</label>
+                                                <input type="text" class="form-control" id="discount" name="discount" value="<%= dish?.discount %>" >
+                                                <% if (errors && errors.discount) { %>
+                                                    <span style="color: red;"><%= errors.discount[0] %></span>
+                                                <% } %>
+                                            </div>
+                                            <div class="form-group mb-2">
+                                                <label for="serve">Serving Quantity</label>
+                                                <input type="text" class="form-control" id="serve" name="serve" value="<%= dish?.serve %>" >
+                                                <% if (errors && errors.serve) { %>
+                                                    <span style="color: red;"><%= errors.serve[0] %></span>
+                                                <% } %> 
+                                            </div>
+                                            <div class="form-group mb-2">
+                                                <label for="description">Description</label>
+                                                <textarea rows="5" name="description" id="description" class="form-control"><%= dish?.description %></textarea>
+                                                <% if (errors && errors.description) { %>
+                                                    <span style="color: red;"><%= errors.description[0] %></span>
+                                                <% } %>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">Submit</button>
+                                        </form>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+</body>
+
+</html>
+<!-- {{#if save}}
+<script>
+    Swal.fire({
+        title: 'New Dish Added!',
+        text: 'Dish is added to outr menu card...',
+        icon: 'success',
+        confirmButtonText: 'OK'
+    })
+</script>
+{{/if}}
+
+{{#if notsave}}
+<script>
+    Swal.fire({
+        title: 'Something is wrong!',
+        text: 'Please fill the important information. dish is not save to our menu card...',
+        icon: 'error',
+        confirmButtonText: 'Cancel'
+    })
+</script>
+{{/if}} -->

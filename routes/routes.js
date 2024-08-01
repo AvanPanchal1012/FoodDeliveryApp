@@ -8,6 +8,8 @@ const UserController = require('../controllers/admin/UserController')
 const LoginController = require('../controllers/admin/LoginController')
 const ContactUsContoller = require('../controllers/admin/ContactUsContoller')
 const RestaurantController = require('../controllers/admin/RestaurantController')
+const DishController = require('../controllers/admin/DishController')
+const OrderController = require('../controllers/admin/OrderController')
 
 route.get("/", (req, res) => {
   const loginUser = req.session.loginUser;
@@ -333,6 +335,19 @@ route.get("/admin/restaurants/:page?", RestaurantController.getAllRestaurants);
 route.get("/admin/restaurants/edit/:id", RestaurantController.getRestaurantById);
 route.post('/admin/restaurants/update/:id', RestaurantController.updateRestaurant);
 route.get('/admin/restaurants/delete/:id', RestaurantController.deleteRestaurant);
+
+route.get("/admin/dishes/add", DishController.addNewDish);
+route.post('/admin/dishes/save', DishController.saveNewDish);
+route.get("/admin/dishes/:page?", DishController.getAllDishes);
+route.get("/admin/dishes/edit/:id", DishController.getDishById);
+route.post('/admin/dishes/update/:id', DishController.updateDish);
+route.get('/admin/dishes/delete/:id', DishController.deleteDish);
+
+//ORDERS
+route.get("/admin/orders/:page?", OrderController.getAllOrders);
+route.get("/admin/orders/cooking/:id", OrderController.cookingStatus);
+route.get("/admin/orders/deliver/:id", OrderController.deliverStatus);
+route.get("/admin/orders/handover/:id", OrderController.completeStatus);
 
 // --------------------------- ADMIN ROUTES ::: END --------------------------- 
 

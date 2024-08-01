@@ -9,4 +9,4 @@ const DishSchema = mongoose.Schema({
   ddiscount: Number,
   dserve: Number,
 });
-module.exports = mongoose.model("Dish", DishSchema);
+module.exports = mongoose.model("Dishes", DishSchema);

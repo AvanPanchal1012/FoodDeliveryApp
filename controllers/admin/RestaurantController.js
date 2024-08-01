@@ -1,6 +1,7 @@
 const Restaurant = require("../../models/Restaurant");
+const Dish = require("../../models/Dish");
 const validate = require('validate.js');
-const validationObj = require('../../validations/admin/UserValidations');
+const validationObj = require('../../validations/admin/RestaurantValidations');
 
 async function checkLoginUser(req, res) {
 
@@ -30,6 +31,7 @@ module.exports = {
       
         res.render('admin/adminRestaurantAdd', {
             loginUser: loginUser,
+            dishes: await Dish.find(),
             errors: null,
             restaurant: null
         })
@@ -37,27 +39,26 @@ module.exports = {
     saveNewRestaurant: async (req, res) => {
         const loginUser = await checkLoginUser(req, res);
     
-        const { name, email, phone, address, password, type } = req.body;
         const profileImage = req.file ? req.file.filename : '';
     
-        const constraints = validationObj.saveUser;
-    
+        const constraints = validationObj.saveRestaurant;
         const validation = validate(req.body, constraints);
     
         if (validation) {
           res.render("admin/adminRestaurantAdd", {
-              user: {
+              restaurant: {
                 ...req.body
               },
               errors: validation,
+              dishes: await Dish.find(),
               loginUser: loginUser
           })
         } else {
     
           // Query to check if email exists
-          const user = await User.findOne({ email: email});
+          const isExists = await Restaurant.findOne({ email: req.body.email});
     
-          if (user) {
+          if (isExists) {
             res.render("admin/adminRestaurantAdd", {
               user: {
                 ...req.body
@@ -68,22 +69,24 @@ module.exports = {
               loginUser: loginUser
             })
           }
-    
-          // Create a new user instance
-          const newUser = new User({
-            name,
-            email,
-            phone,
-            password,
-            address,
-            type,
-            profileImage
+
+          // Create a new instance
+          const newRestaurant = new Restaurant({
+            name: req.body.name,
+            location: req.body.location,
+            cuisine: req.body.cuisine,
+            email: req.body.email,
+            contact: req.body.contact,
+            openingHours: req.body.openingHours,
+            description: req.body.description,
+            photo: req.file ? req.file.filename : '',
+            dishIds: req.body.dishIds
           });
     
           // Save the user to the database
-          await newUser.save();
+          await newRestaurant.save();
     
-          res.redirect('/admin/users'); // Redirect to the users list or a success page
+          res.redirect('/admin/restaurants'); 
         }
     },
     getAllRestaurants: async (req, res) => {
@@ -96,12 +99,12 @@ module.exports = {
       
         const total = 5;
         const start = (currentPage - 1) * total;
-        const data = await Restaurant.find().skip(start).limit(total);
+        const data = await Restaurant.find().populate('dishIds', 'dname').skip(start).limit(total);
         const totalPage = Math.ceil(await Restaurant.find().countDocuments() / total);
-        
+     
         res.render('admin/adminRestaurants', {
             loginUser: loginUser,
-            users: data,
+            data: data,
             currentPage: currentPage,
             count: totalPage
         })
@@ -109,12 +112,13 @@ module.exports = {
     getRestaurantById: async (req, res) => {
         const loginUser = await checkLoginUser(req, res);
       
-        const data = await User.findOne({_id: req.params.id, type : {$ne: 'admin'}})
-        console.log(data);
+        const data = await Restaurant.findOne({_id: req.params.id})
+       
         if (data) {
             res.render("admin/adminRestaurantAdd", {
-                user: data,
+                restaurant: data,
                 errors: null,
+                dishes: await Dish.find(),
                 loginUser: loginUser
             })
         } else {
@@ -124,27 +128,37 @@ module.exports = {
     updateRestaurant: async (req, res) => {
         const loginUser = await checkLoginUser(req, res);
     
-        const userId = req.params.id;
-        const { name, email, phone, address, password } = req.body;
-    
-        const constraints = validationObj.modifyUser;
+        const restaurantId = req.params.id;
+
+        const constraints = validationObj.saveRestaurant;
     
         const validation = validate(req.body, constraints);
-    
+      
         if (validation) {
           res.render("admin/adminRestaurantAdd", {
-              user: {
-                _id: userId,
+              restaurant: {
+                _id: restaurantId,
                 ...req.body
               },
+              dishes: await Dish.find(),
               errors: validation,
               loginUser: loginUser
           })
         } else {
-          const updateData = { name, email, phone, address };
+          const updateData = { 
+            name: req.body.name,
+            location: req.body.location,
+            cuisine: req.body.cuisine,
+            email: req.body.email,
+            contact: req.body.contact,
+            openingHours: req.body.openingHours,
+            description: req.body.description,
+            photo: req.file ? req.file.filename : '',
+            dishIds: req.body.dishIds
+          };
     
           // Query to check if email exists
-          const emailExist = await User.findOne({ email: email, _id: {$ne: userId}});
+          const emailExist = await Restaurant.findOne({ email: updateData.email, _id: {$ne: restaurantId}});
     
           if (emailExist) {
             res.render("admin/adminRestaurantAdd", {
@@ -162,18 +176,13 @@ module.exports = {
               updateData.profileImage = req.file.filename;
             }
       
-            if (password) {
-              const salt = await bcrypt.genSalt(10);
-              updateData.password = await bcrypt.hash(password, salt);
-            }
-      
-            const user = await User.findByIdAndUpdate(userId, updateData, { new: true });
+            const user = await Restaurant.findByIdAndUpdate(restaurantId, updateData, { new: true });
       
             if (!user) {
-              return res.status(404).send('User not found');
+              return res.status(404).send('Restaurant not found');
             }
       
-            res.redirect('/admin/users'); // Adjust the redirect as necessary
+            res.redirect('/admin/restaurants'); // Adjust the redirect as necessary
           }
           
         }
@@ -184,9 +193,9 @@ module.exports = {
         const data = await User.deleteOne({ "_id": req.params.id })
         if (data) {
             console.log("file is deleted...")
-            res.redirect('/admin/users')
+            res.redirect('/admin/restaurants')
         } else {
-            res.send("<h1>Server Error !!</h1><h2> Sorry user is not deleted please try letter..</h2>")
+            res.send("<h1>Server Error !!</h1><h2> Sorry restaurant is not deleted please try letter..</h2>")
         }
     }
 }

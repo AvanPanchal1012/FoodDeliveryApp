@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Dish = require("./Dish");
 
 // Define the schema for the Restaurant model
 const restaurantSchema = new mongoose.Schema({
@@ -23,6 +24,11 @@ const restaurantSchema = new mongoose.Schema({
     max: 5,
     default: 0,
   },
+  email: {
+    type: String,
+    required: true,
+    trim: true,
+  },
   contact: {
     type: String,
     trim: true,
@@ -42,7 +48,7 @@ const restaurantSchema = new mongoose.Schema({
   dishIds: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Dish",
+      ref: "Dishes",
     },
   ],
 });
