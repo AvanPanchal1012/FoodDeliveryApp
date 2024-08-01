@@ -1,6 +1,7 @@
 const Dish = require("../../models/Dish");
 const validate = require('validate.js');
 const validationObj = require('../../validations/admin/DishValidations');
+const upload = require('../../helpers/UploadHelper');
 
 async function checkLoginUser(req, res) {
 
@@ -35,40 +36,54 @@ module.exports = {
         })
     },
     saveNewDish: async (req, res) => {
-        const loginUser = await checkLoginUser(req, res);
-    
-        const profileImage = req.file ? req.file.filename : '';
-    
-        const constraints = validationObj.saveDish;
-        const validation = validate(req.body, constraints);
-    
-        if (validation) {
+      const loginUser = await checkLoginUser(req, res);
+  
+      upload(req, res, async (err) => {
+        if (err) {
+          console.log(err);
           res.render("admin/adminDishAdd", {
-              dish: {
-                ...req.body
-              },
-              errors: validation,
-              loginUser: loginUser
+            dish: {
+              ...req.body
+            },
+            errors: null,
+            loginUser: loginUser
           })
-        } else {
-
-          // Create a new instance
-          const newDish = new Dish({
-            dname: req.body.name,
-            dtype: req.body.type,
-            dprice: req.body.price,
-            dtime: req.body.time,
-            discription: req.body.description,
-            ddiscount: req.body.discount,
-            dserve: req.body.serve,
-            photo: req.file ? req.file.filename : '' 
-          });
-    
-          // Save the user to the database
-          await newDish.save();
-    
-          res.redirect('/admin/dishes'); 
+        } 
+        else {
+          const profileImage = req.file ? req.file.filename : '';
+          
+          const constraints = validationObj.saveDish;
+          const validation = validate(req.body, constraints);
+      
+          if (validation) {
+            res.render("admin/adminDishAdd", {
+                dish: {
+                  ...req.body
+                },
+                errors: validation,
+                loginUser: loginUser
+            })
+          } else {
+      
+            // Create a new instance
+            const newDish = new Dish({
+              dname: req.body.name,
+              dtype: req.body.type,
+              dprice: req.body.price,
+              dtime: req.body.time,
+              discription: req.body.description,
+              ddiscount: req.body.discount,
+              dserve: req.body.serve,
+              photo: req.file ? `/uploads/${req.file.filename}` : '',
+            });
+      
+            // Save the user to the database
+            await newDish.save();
+      
+            res.redirect('/admin/dishes'); 
+          }
         }
+      });
     },
     getAllDishes: async (req, res) => {
         const loginUser = await checkLoginUser(req, res);
@@ -116,47 +131,61 @@ module.exports = {
         }
     },
     updateDish: async (req, res) => {
-        const loginUser = await checkLoginUser(req, res);
-    
+        const loginUser = await checkLoginUser(req, res);    
         const dishId = req.params.id;
 
-        const constraints = validationObj.saveDish;
-    
-        const validation = validate(req.body, constraints);
-    
-        if (validation) {
-          res.render("admin/adminDishAdd", {
+        upload(req, res, async (err) => {
+          if (err) {
+            console.log(err);
+            res.render("admin/adminDishAdd", {
               dish: {
                 _id: dishId,
                 ...req.body
               },
-              errors: validation,
+              errors: null,
               loginUser: loginUser
-          })
-        } else { 
-          const updateData = { 
-            dname: req.body.name,
-            dtype: req.body.type,
-            dprice: req.body.price,
-            dtime: req.body.time,
-            discription: req.body.description,
-            ddiscount: req.body.discount,
-            dserve: req.body.serve,
-            photo: req.file ? req.file.filename : '' 
-          };
-    
-          if (req.file) {
-            updateData.profileImage = req.file.filename;
+            })
+          } 
+          else {
+            const constraints = validationObj.saveDish;
+          
+            const validation = validate(req.body, constraints);
+          
+            if (validation) {
+              res.render("admin/adminDishAdd", {
+                  dish: {
+                    _id: dishId,
+                    ...req.body
+                  },
+                  errors: validation,
+                  loginUser: loginUser
+              })
+            } else { 
+              const updateData = { 
+                dname: req.body.name,
+                dtype: req.body.type,
+                dprice: req.body.price,
+                dtime: req.body.time,
+                discription: req.body.description,
+                ddiscount: req.body.discount,
+                dserve: req.body.serve,
+                photo: req.file ? `/uploads/${req.file.filename}` : ''
+              };
+        
+              if (req.file) {
+                updateData.profileImage = req.file.filename;
+              }
+        
+              const dish = await Dish.findByIdAndUpdate(dishId, updateData, { new: true });
+        
+              if (!dish) {
+                return res.status(404).send('Dish not found');
+              }
+        
+              res.redirect('/admin/dishes'); // Adjust the redirect as necessary
+            }
           }
-    
-          const dish = await Dish.findByIdAndUpdate(dishId, updateData, { new: true });
-    
-          if (!dish) {
-            return res.status(404).send('Dish not found');
-          }
-    
-          res.redirect('/admin/dishes'); // Adjust the redirect as necessary
-        }
+        });
     },
     deleteDish: async (req, res) => {
         const loginUser = await checkLoginUser(req, res);

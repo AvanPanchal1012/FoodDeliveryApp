@@ -6,6 +6,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Users | Foodie Admin</title>
+    <style>
+        .user-image img {
+            width: 50px;
+            display: inline-block;
+            border-radius: 50%;
+            height: 50px;
+        }
+    </style>
 </head>
 
 <body>
@@ -38,7 +46,14 @@
                                 <tbody>
                                     <% users.forEach(user => { %>
                                         <tr>
-                                            <td><%= user.name %></td>
+                                            <td>
+                                                <% if(user.profileImage) { %>
+                                                    <span class="user-image"><img src="<%= user.profileImage %>" /> </span>
+                                                <% } else { %>
+                                                    <span class="d-inline-block user-image-default" style="width: 50px;"></span>
+                                                <% }%>
+                                                <%= user.name %>
+                                            </td>
                                             <td><a href="mailto:<%= user.email %>" target="_blank"><%= user.email %></a></td>
                                             <td><%= user.phone %></td>
                                             <td><%= user.address %></td>

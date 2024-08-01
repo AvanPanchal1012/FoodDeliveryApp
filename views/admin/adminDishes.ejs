@@ -6,6 +6,14 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dishes | Foodie Admin</title>
+    <style>
+        .user-image img {
+            width: 50px;
+            display: inline-block;
+            border-radius: 50%;
+            height: 50px;
+        }
+    </style>
 </head>
 
 <body>
@@ -29,6 +37,7 @@
 
                             <table class="table table-hover table-striped px-md-2">
                                 <thead>
+                                    <td></td>
                                     <td width="20%">Name</td>
                                     <td width="20%"></td>
                                     <td width="20%"></td>
@@ -38,6 +47,13 @@
                                 <tbody>
                                     <% data.forEach(dish => { %>
                                         <tr>
+                                            <td>
+                                                <% if(dish.photo) { %>
+                                                    <span class="user-image"><img src="<%= dish.photo %>" /> </span>
+                                                <% } else { %>
+                                                    <span class="d-inline-block user-image-default" style="width: 50px;"></span>
+                                                <% }%>
+                                            </td>
                                             <td>
                                                 <span class="text-muted">Name: </span><%= dish.dname %><br/>
                                                 <span class="text-muted">Type: </span><%= dish.dtype %>

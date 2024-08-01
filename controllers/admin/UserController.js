@@ -1,8 +1,7 @@
 const User = require("../../models/User");
-const path = require("path");
-const multer = require('multer');
 const validate = require('validate.js');
 const validationObj = require('../../validations/admin/UserValidations');
+const upload = require('../../helpers/UploadHelper');
 
 async function checkLoginUser(req, res) {
 
@@ -26,36 +25,6 @@ async function checkLoginUser(req, res) {
   // }
 }
 
-const storage = multer.diskStorage({
-    destination: "./public/uploads/",
-    filename: function (req, file, cb) {
-      cb(
-        null,
-        file.fieldname + "-" + Date.now() + path.extname(file.originalname)
-      );
-    }
-});
-  
-const upload = multer({
-    storage: storage,
-    limits: { fileSize: 1000000 },
-    fileFilter: function (req, file, cb) {
-      checkFileType(file, cb);
-    },
-}).single("profileImage");
-
-function checkFileType(file, cb) {
-    const filetypes = /jpeg|jpg|png|gif/;
-    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = filetypes.test(file.mimetype);
-  
-    if (mimetype && extname) {
-      return cb(null, true);
-    } else {
-      cb("Error: Images Only!");
-    }
-}
-
 module.exports = {
     addNewUser: async (req, res) => {
         const loginUser = await checkLoginUser(req, res);
@@ -69,54 +38,68 @@ module.exports = {
     saveNewUser: async (req, res) => {
         const loginUser = await checkLoginUser(req, res);
     
-        const { name, email, phone, address, password, type } = req.body;
-        const profileImage = req.file ? req.file.filename : '';
-    
-        const constraints = validationObj.saveUser;
-    
-        const validation = validate(req.body, constraints);
-    
-        if (validation) {
-          res.render("admin/adminUserAdd", {
+        upload(req, res, async (err) => {
+          if (err) {
+            res.render("admin/adminUserAdd", {
               user: {
                 ...req.body
               },
               errors: validation,
               loginUser: loginUser
-          })
-        } else {
-    
-          // Query to check if email exists
-          const user = await User.findOne({ email: email});
-    
-          if (user) {
-            res.render("admin/adminUserAdd", {
-              user: {
-                ...req.body
-              },
-              errors: {
-                email: ["Email address is already taken"]
-              },
-              loginUser: loginUser
             })
+          } 
+          else {
+              const { name, email, phone, address, password, type } = req.body;
+              const profileImage = req.file ? `/uploads/${req.file.filename}` : '';
+          
+              const constraints = validationObj.saveUser;
+          
+              const validation = validate(req.body, constraints);
+          
+              if (validation) {
+                res.render("admin/adminUserAdd", {
+                    user: {
+                      ...req.body
+                    },
+                    errors: validation,
+                    loginUser: loginUser
+                })
+              } else {
+          
+                // Query to check if email exists
+                const user = await User.findOne({ email: email});
+          
+                if (user) {
+                  res.render("admin/adminUserAdd", {
+                    user: {
+                      ...req.body
+                    },
+                    errors: {
+                      email: ["Email address is already taken"]
+                    },
+                    loginUser: loginUser
+                  })
+                }
+          
+                // Create a new user instance
+                const newUser = new User({
+                  name,
+                  email,
+                  phone,
+                  password,
+                  address,
+                  type,
+                  profileImage
+                });
+          
+                // Save the user to the database
+                await newUser.save();
+          
+                res.redirect('/admin/users'); // Redirect to the users list or a success page
+              }
           }
-    
-          // Create a new user instance
-          const newUser = new User({
-            name,
-            email,
-            phone,
-            password,
-            address,
-            type,
-            profileImage
-          });
-    
-          // Save the user to the database
-          await newUser.save();
-    
-          res.redirect('/admin/users'); // Redirect to the users list or a success page
-        }
+        });
+
     },
     getAllUsers: async (req, res) => {
         const loginUser = await checkLoginUser(req, res);
@@ -155,60 +138,75 @@ module.exports = {
     },
     updateUser: async (req, res) => {
         const loginUser = await checkLoginUser(req, res);
-    
         const userId = req.params.id;
-        const { name, email, phone, address, password } = req.body;
     
-        const constraints = validationObj.modifyUser;
-    
-        const validation = validate(req.body, constraints);
-    
-        if (validation) {
-          res.render("admin/adminUserAdd", {
+        upload(req, res, async (err) => {
+          if (err) {
+            res.render("admin/adminUserAdd", {
               user: {
                 _id: userId,
                 ...req.body
               },
-              errors: validation,
-              loginUser: loginUser
-          })
-        } else {
-          const updateData = { name, email, phone, address };
-    
-          // Query to check if email exists
-          const emailExist = await User.findOne({ email: email, _id: {$ne: userId}});
-    
-          if (emailExist) {
-            res.render("admin/adminUserAdd", {
-              user: {
-                ...req.body
-              },
-              errors: {
-                email: ["Email address is already taken"]
-              },
+              errors: null,
               loginUser: loginUser
             })
-          }
+          } 
           else {
-            if (req.file) {
-              updateData.profileImage = req.file.filename;
-            }
-      
-            if (password) {
-              const salt = await bcrypt.genSalt(10);
-              updateData.password = await bcrypt.hash(password, salt);
-            }
-      
-            const user = await User.findByIdAndUpdate(userId, updateData, { new: true });
-      
-            if (!user) {
-              return res.status(404).send('User not found');
-            }
-      
-            res.redirect('/admin/users'); // Adjust the redirect as necessary
-          }
+            const { name, email, phone, address, password } = req.body;
+        
+            const constraints = validationObj.modifyUser;
+        
+            const validation = validate(req.body, constraints);
+        
+            if (validation) {
+              res.render("admin/adminUserAdd", {
+                  user: {
+                    _id: userId,
+                    ...req.body
+                  },
+                  errors: validation,
+                  loginUser: loginUser
+              })
+            } else {
+              const updateData = { name, email, phone, address };
+        
+              // Query to check if email exists
+              const emailExist = await User.findOne({ email: email, _id: {$ne: userId}});
+        
+              if (emailExist) {
+                res.render("admin/adminUserAdd", {
+                  user: {
+                    _id: userId,
+                    ...req.body
+                  },
+                  errors: {
+                    email: ["Email address is already taken"]
+                  },
+                  loginUser: loginUser
+                })
+              }
+              else {
+                if (req.file) {
+                  updateData.profileImage = `/uploads/${req.file.filename}`;
+                }
           
-        }
+                if (password) {
+                  const salt = await bcrypt.genSalt(10);
+                  updateData.password = await bcrypt.hash(password, salt);
+                }
+          
+                const user = await User.findByIdAndUpdate(userId, updateData, { new: true });
+          
+                if (!user) {
+                  return res.status(404).send('User not found');
+                }
+          
+                res.redirect('/admin/users'); // Adjust the redirect as necessary
+              }
+              
+            }
+          }
+        });
     },
     deleteUser: async (req, res) => {
         const loginUser = await checkLoginUser(req, res);

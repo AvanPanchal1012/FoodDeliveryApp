@@ -1,6 +1,4 @@
 const Order = require("../../models/Order");
-const validate = require('validate.js');
-const validationObj = require('../../validations/admin/DishValidations');
 
 async function checkLoginUser(req, res) {
 
@@ -34,61 +32,34 @@ module.exports = {
         if (page)
             currentPage = page;
 
-        const total = 10;
+        const total = 5;
         const start = (currentPage - 1) * total;
-        const data = await order.find().skip(start).limit(total);
-        const totalPage = Math.ceil(order.find().countDocuments() / total);
+        const data = await Order.find().skip(start).limit(total);
+        const totalPage = Math.ceil(await Order.find().countDocuments() / total);
 
-        console.log("place order" + data)
-        res.render('adminOrders', {
-            loginuser: loginUser,
+        res.render('admin/adminOrders', {
+            loginUser: loginUser,
             orders: data,
             currentPage: currentPage,
             count: totalPage
         })
     },
     cookingStatus: async (req, res) => {
-        if (req.session.loginUser) {
-            if (req.session.loginUser.type == 'admin') {
-                
-                const data = await order.updateOne({ _id: req.params.id }, { $set: { states: "Cooking" } })
-                res.redirect("/admin/adminOrder/1")
-            }else
-            res.send("<h2>Wrong page try to access...</h2>")
-        } else {
-            res.render("login", {
-                loginFirst: true
-            })
-        }
+        const loginUser = await checkLoginUser(req, res);
+
+        const data = await Order.updateOne({ _id: req.params.id }, { $set: { states: "Cooking" } })
+        res.redirect("/admin/orders");
     },
     deliverStatus: async (req, res) => {
-        if (req.session.loginUser) {
-            if (req.session.loginUser.type == 'admin') {
-            
-                const data = await order.updateOne({ _id: req.params.id }, { $set: { states: "Out for deliver." } })
-                
-                res.redirect("/admin/adminOrder/1")
-            }else
-            res.send("<h2>Wrong page try to access...</h2>")
-        } else {
-            res.render("login", {
-                loginFirst: true
-            })
-        }
+        const loginUser = await checkLoginUser(req, res);
+
+        const data = await Order.updateOne({ _id: req.params.id }, { $set: { states: "Out for deliver." } })
+        res.redirect("/admin/orders");
     },
     completeStatus: async (req, res) => {
-        if (req.session.loginUser) {
-            if (req.session.loginUser.type == 'admin') {
-                console.log("function i scalled")
-                const data = await order.updateOne({ _id: req.params.id }, { $set: { states: "Order completed." } })
-        
-                res.redirect("/admin/adminOrder/1")
-            }else
-            res.send("<h2>Wrong page try to access...</h2>")
-        } else {
-            res.render("login", {
-                loginFirst: true
-            })
-        }
+        const loginUser = await checkLoginUser(req, res);
+
+        const data = await Order.updateOne({ _id: req.params.id }, { $set: { states: "Order completed." } })
+        res.redirect("/admin/orders");
     }
 }

@@ -2,6 +2,7 @@ const Restaurant = require("../../models/Restaurant");
 const Dish = require("../../models/Dish");
 const validate = require('validate.js');
 const validationObj = require('../../validations/admin/RestaurantValidations');
+const upload = require('../../helpers/UploadHelper');
 
 async function checkLoginUser(req, res) {
 
@@ -39,55 +40,69 @@ module.exports = {
     saveNewRestaurant: async (req, res) => {
         const loginUser = await checkLoginUser(req, res);
     
-        const profileImage = req.file ? req.file.filename : '';
-    
-        const constraints = validationObj.saveRestaurant;
-        const validation = validate(req.body, constraints);
-    
-        if (validation) {
-          res.render("admin/adminRestaurantAdd", {
-              restaurant: {
-                ...req.body
-              },
-              errors: validation,
-              dishes: await Dish.find(),
-              loginUser: loginUser
-          })
-        } else {
-    
-          // Query to check if email exists
-          const isExists = await Restaurant.findOne({ email: req.body.email});
-    
-          if (isExists) {
+        upload(req, res, async (err) => {
+          if (err) {
+            console.log(err);
             res.render("admin/adminRestaurantAdd", {
-              user: {
-                ...req.body
-              },
-              errors: {
-                email: ["Email address is already taken"]
-              },
-              loginUser: loginUser
+                restaurant: {
+                  ...req.body
+                },
+                errors: null,
+                dishes: await Dish.find(),
+                loginUser: loginUser
             })
+          } 
+          else {
+        
+            const constraints = validationObj.saveRestaurant;
+            const validation = validate(req.body, constraints);
+        
+            if (validation) {
+              res.render("admin/adminRestaurantAdd", {
+                  restaurant: {
+                    ...req.body
+                  },
+                  errors: validation,
+                  dishes: await Dish.find(),
+                  loginUser: loginUser
+              })
+            } else {
+        
+              // Query to check if email exists
+              const isExists = await Restaurant.findOne({ email: req.body.email});
+        
+              if (isExists) {
+                res.render("admin/adminRestaurantAdd", {
+                  user: {
+                    ...req.body
+                  },
+                  errors: {
+                    email: ["Email address is already taken"]
+                  },
+                  loginUser: loginUser
+                })
+              }
+        
+              // Create a new instance
+              const newRestaurant = new Restaurant({
+                name: req.body.name,
+                location: req.body.location,
+                cuisine: req.body.cuisine,
+                email: req.body.email,
+                contact: req.body.contact,
+                openingHours: req.body.openingHours,
+                description: req.body.description,
+                photo: req.file ? `/uploads/${req.file.filename}` : '',
+                dishIds: req.body.dishIds
+              });
+        
+              // Save the user to the database
+              await newRestaurant.save();
+        
+              res.redirect('/admin/restaurants'); 
+            }
           }
-
-          // Create a new instance
-          const newRestaurant = new Restaurant({
-            name: req.body.name,
-            location: req.body.location,
-            cuisine: req.body.cuisine,
-            email: req.body.email,
-            contact: req.body.contact,
-            openingHours: req.body.openingHours,
-            description: req.body.description,
-            photo: req.file ? req.file.filename : '',
-            dishIds: req.body.dishIds
-          });
-    
-          // Save the user to the database
-          await newRestaurant.save();
-    
-          res.redirect('/admin/restaurants'); 
-        }
+        });
     },
     getAllRestaurants: async (req, res) => {
         const loginUser = await checkLoginUser(req, res);
@@ -126,66 +141,85 @@ module.exports = {
         }
     },
     updateRestaurant: async (req, res) => {
-        const loginUser = await checkLoginUser(req, res);
-    
-        const restaurantId = req.params.id;
-
-        const constraints = validationObj.saveRestaurant;
-    
-        const validation = validate(req.body, constraints);
-      
-        if (validation) {
+      const loginUser = await checkLoginUser(req, res);
+  
+      const restaurantId = req.params.id;
+      upload(req, res, async (err) => {
+        if (err) {
+          console.log(err);
           res.render("admin/adminRestaurantAdd", {
-              restaurant: {
-                _id: restaurantId,
-                ...req.body
-              },
-              dishes: await Dish.find(),
-              errors: validation,
-              loginUser: loginUser
+            restaurant: {
+              _id: restaurantId,
+              ...req.body
+            },
+            dishes: await Dish.find(),
+            errors: null,
+            loginUser: loginUser
           })
-        } else {
-          const updateData = { 
-            name: req.body.name,
-            location: req.body.location,
-            cuisine: req.body.cuisine,
-            email: req.body.email,
-            contact: req.body.contact,
-            openingHours: req.body.openingHours,
-            description: req.body.description,
-            photo: req.file ? req.file.filename : '',
-            dishIds: req.body.dishIds
-          };
-    
-          // Query to check if email exists
-          const emailExist = await Restaurant.findOne({ email: updateData.email, _id: {$ne: restaurantId}});
-    
-          if (emailExist) {
-            res.render("admin/adminRestaurantAdd", {
-              user: {
-                ...req.body
-              },
-              errors: {
-                email: ["Email address is already taken"]
-              },
-              loginUser: loginUser
-            })
-          }
-          else {
-            if (req.file) {
-              updateData.profileImage = req.file.filename;
-            }
+        } 
+        else {
       
-            const user = await Restaurant.findByIdAndUpdate(restaurantId, updateData, { new: true });
+          const constraints = validationObj.saveRestaurant;
       
-            if (!user) {
-              return res.status(404).send('Restaurant not found');
-            }
-      
-            res.redirect('/admin/restaurants'); // Adjust the redirect as necessary
-          }
+          const validation = validate(req.body, constraints);
           
+          if (validation) {
+            res.render("admin/adminRestaurantAdd", {
+                restaurant: {
+                  _id: restaurantId,
+                  ...req.body
+                },
+                dishes: await Dish.find(),
+                errors: validation,
+                loginUser: loginUser
+            })
+          } else {
+            const updateData = { 
+              name: req.body.name,
+              location: req.body.location,
+              cuisine: req.body.cuisine,
+              email: req.body.email,
+              contact: req.body.contact,
+              openingHours: req.body.openingHours,
+              description: req.body.description,
+              photo: req.file ? `/uploads/${req.file.filename}` : '',
+              dishIds: req.body.dishIds
+            };
+      
+            // Query to check if email exists
+            const emailExist = await Restaurant.findOne({ email: updateData.email, _id: {$ne: restaurantId}});
+      
+            if (emailExist) {
+              res.render("admin/adminRestaurantAdd", {
+                restaurant: {
+                  _id: restaurantId,
+                  ...req.body
+                },
+                dishes: await Dish.find(),
+                errors: validation,
+                loginUser: loginUser
+              })
+            }
+            else {
+              console.log(updateData);
+
+              if (req.file) {
+                updateData.photo = req.file ? `/uploads/${req.file.filename}` : '';
+              }
+              console.log(updateData);
+        
+              const restaurant = await Restaurant.findByIdAndUpdate(restaurantId, updateData, { new: true });
+        
+              if (!restaurant) {
+                return res.status(404).send('Restaurant not found');
+              }
+        
+              res.redirect('/admin/restaurants'); // Adjust the redirect as necessary
+            }
+            
+          }
         }
+      });
     },
     deleteRestaurant: async (req, res) => {
         const loginUser = await checkLoginUser(req, res);

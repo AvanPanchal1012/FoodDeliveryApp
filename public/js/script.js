@@ -96,7 +96,7 @@ function updateCart() {
     cart.forEach((item, index) => {
       table += `
                <tr>
-                   <td> <img style='width:50px;height:50px;border-radius:50%' src='/static/image/img/${item.image}'/> </td>
+                   <td> <img style='width:50px;height:50px;border-radius:50%' src='${item.image}'/> </td>
                    <td><small>${item.name}</small></td>
                    <td><small>${item.price}</small></td>
                    <td>

@@ -1,4 +1,7 @@
 const User = require("../../models/User");
+const Order = require("../../models/Order");
+const Restaurant = require("../../models/Restaurant");
+const Contacts = require("../../models/Contact");
 
 async function checkLoginUser(req, res) {
 
@@ -41,9 +44,13 @@ module.exports = {
     },
     adminDashboard: async (req, res) => {
         const loginUser = await checkLoginUser(req, res);
-        
+
         res.render("admin/adminDashboard", {
           loginUser: loginUser,
+          users: await User.find({type : {$ne: 'admin'}}).countDocuments(),
+          restaurants: await Restaurant.find().countDocuments(),
+          contacts: await Contacts.find().countDocuments(),
+          orders: await Order.find().countDocuments(),
         });
     }
 }
