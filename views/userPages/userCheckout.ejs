@@ -43,7 +43,6 @@
                     </div>
                     <div class="card">
                         <div class="card-body cart-body"></div>
-                        <div id="orderPlaced"></div>
 
                     </div>
                     <div class="card col-md-3 p-3">
@@ -65,18 +64,18 @@
                         <div id="cashOnDeliveryForm" class="card" style="display:none;">
                             <div class="card-body">
                                 <h4>Cash on Delivery Information</h4>
-                                <form>
+                                <form id="codForm">
                                     <div class="mb-3">
                                         <label for="codName" class="form-label">Name</label>
-                                        <input type="text" class="form-control" id="codName" value="<%= loginUser.name %>">
+                                        <input type="text" class="form-control" id="codName" value="<%= loginUser.name %>" required>
                                     </div>
                                     <div class="mb-3">
                                         <label for="codPhone" class="form-label">Phone Number</label>
-                                        <input type="text" class="form-control" id="codPhone" value="<%= loginUser.phone %>">
+                                        <input type="text" class="form-control" id="codPhone" value="<%= loginUser.phone %>" required>
                                     </div>
                                     <div class="mb-3">
                                         <label for="codAddress" class="form-label">Address</label>
-                                        <input type="text" class="form-control" id="codAddress" value="<%= loginUser.address %>">
+                                        <input type="text" class="form-control" id="codAddress" value="<%= loginUser.address %>" required>
                                     </div>
                                 </form>
                             </div>
@@ -84,39 +83,39 @@
                         <div id="onlinePaymentForm" class="card" style="display:none;">
                             <div class="card-body">
                                 <h4>Online Payment Information</h4>
-                                <form>
+                                <form id="onlineForm">
                                     <div class="mb-3">
                                         <label for="onlineName" class="form-label">Name</label>
-                                        <input type="text" class="form-control" id="onlineName" value="<%= loginUser.name %>">
+                                        <input type="text" class="form-control" id="onlineName" value="<%= loginUser.name %>" required>
                                     </div>
                                     <div class="mb-3">
                                         <label for="onlinePhone" class="form-label">Phone Number</label>
-                                        <input type="text" class="form-control" id="onlinePhone" value="<%= loginUser.phone %>">
+                                        <input type="text" class="form-control" id="onlinePhone" value="<%= loginUser.phone %>" required>
                                     </div>
                                     <div class="mb-3">
                                         <label for="onlineAddress" class="form-label">Address</label>
-                                        <input type="text" class="form-control" id="onlineAddress" value="<%= loginUser.address %>">
+                                        <input type="text" class="form-control" id="onlineAddress" value="<%= loginUser.address %>" required>
                                     </div>
                                     <div class="mb-3">
                                         <label for="cardNumber" class="form-label">Card Number</label>
-                                        <input type="text" class="form-control" id="cardNumber" pattern="\d{16}" title="Card number must be 16 digits" required>
+                                        <input type="text" class="form-control" id="cardNumber" pattern="\d{16}" maxlength="16" placeholder="Card number must be 16 digits" required>
                                     </div>
                                     <div class="mb-3">
                                         <label for="expiryDate" class="form-label">Expiry Date</label>
-                                        <input type="text" class="form-control" id="expiryDate" placeholder="MM/YY" pattern="(0[1-9]|1[0-2])\/\d{2}" title="Expiry date must be in MM/YY format" required>
+                                        <input type="text" class="form-control" id="expiryDate" placeholder="MM/YY" maxlength="5" pattern="(0[1-9]|1[0-2])\/\d{2}" title="Expiry date must be in MM/YY format" required>
                                     </div>
                                     <div class="mb-3">
                                         <label for="cvv" class="form-label">CVV</label>
-                                        <input type="text" class="form-control" id="cvv" pattern="\d{3}" title="CVV must be 3 digits" required>
+                                        <input type="password" class="form-control" id="cvv" pattern="\d{3}" maxlength="3" placeholder="CVV must be 3 digits" required>
                                     </div>
                                 </form>
                             </div>
                         </div>
-    
-                            <div class="text-right">
-                                <button onclick="call()" class="main-btn order-btn">Order now !!</button>
-                            </div>
-                        
+                        <div id="orderPlaced"></div>
+                        <div class="text-right">
+                            <button onclick="call()" class="main-btn order-btn">Order now !!</button>
+                        </div>
+
                     </div>
 
                 </div>
@@ -134,11 +133,15 @@
         function call() {
             if (localStorage.length != 0) {
                 var paymentType = '';
-                if (document.getElementById('offline').checked)
+                var form;
+
+                if (document.getElementById('offline').checked) {
                     paymentType = 'cash on delivery';
-                else if (document.getElementById('online').checked)
+                    form = document.getElementById('codForm');
+                } else if (document.getElementById('online').checked) {
                     paymentType = 'online';
-                else {
+                    form = document.getElementById('onlineForm');
+                } else {
                     Swal.fire({
                         title: 'Please select payment type',
                         icon: 'info',
@@ -147,6 +150,19 @@
                     return;
                 }
 
+                // Validate form
+                if (!form.checkValidity()) {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Please fill out all required fields correctly.',
+                        icon: 'error',
+                        confirmButtonText: 'Ok!'
+                    });
+                    form.reportValidity();
+                    return;
+                }
+
+                // Submit the order
                 $.ajax({
                     type: 'POST',
                     url: '/orderNowFromBasket',
@@ -154,6 +170,7 @@
                     success: function (data) {
                         localStorage.clear();
                         document.getElementById("orderPlaced").innerHTML = `<div class="text-success px-3">Your order is successfully placed...</div>`;
+                        resetForms();
                     },
                     error: function (data) {
                         Swal.fire({
@@ -167,6 +184,11 @@
             } else {
                 location.assign('/user/orderFood')
             }
+        }
+
+        function resetForms() {
+            document.getElementById("codForm").reset();
+            document.getElementById("onlineForm").reset();
         }
     </script>
 </body>
