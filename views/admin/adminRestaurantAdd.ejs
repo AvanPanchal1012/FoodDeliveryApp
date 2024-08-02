@@ -66,20 +66,20 @@
                                                 <label for="cuisine">Cuisine</label>
                                                 <select class="form-control" id="cuisine" name="cuisine">
                                                     <option value="">Select Cuisine</option>
-                                                    <option value="italian" <%= restaurant?.cuisine == 'italian' ? 'selected' : '' %>>Italian</option>
-                                                    <option value="chinese" <%= restaurant?.cuisine == 'chinese' ? 'selected' : '' %> >Chinese</option>
-                                                    <option value="japanese" <%= restaurant?.cuisine == 'japanese' ? 'selected' : '' %> >Japanese</option>
-                                                    <option value="indian" <%= restaurant?.cuisine == 'indian' ? 'selected' : '' %> >Indian</option>
-                                                    <option value="mexican" <%= restaurant?.cuisine == 'mexican' ? 'selected' : '' %> >Mexican</option>
-                                                    <option value="french" <%= restaurant?.cuisine == 'french' ? 'selected' : '' %> >French</option>
-                                                    <option value="thai" <%= restaurant?.cuisine == 'thai' ? 'selected' : '' %> >Thai</option>
-                                                    <option value="spanish" <%= restaurant?.cuisine == 'spanish' ? 'selected' : '' %> >Spanish</option>
-                                                    <option value="greek" <%= restaurant?.cuisine == 'greek' ? 'selected' : '' %> >Greek</option>
-                                                    <option value="mediterranean" <%= restaurant?.cuisine == 'mediterranean' ? 'selected' : '' %> >Mediterranean</option>
-                                                    <option value="vietnamese" <%= restaurant?.cuisine == 'vietnamese' ? 'selected' : '' %> >Vietnamese</option>
-                                                    <option value="korean" <%= restaurant?.cuisine == 'korean' ? 'selected' : '' %> >Korean</option>
-                                                    <option value="brazilian" <%= restaurant?.cuisine == 'brazilian' ? 'selected' : '' %> >Brazilian</option>
-                                                    <option value="turkish" <%= restaurant?.cuisine == 'turkish' ? 'selected' : '' %> >Turkish</option>
+                                                    <option value="italian" <%= restaurant?.cuisine.toLowerCase() == 'italian' ? 'selected' : '' %>>Italian</option>
+                                                    <option value="chinese" <%= restaurant?.cuisine.toLowerCase() == 'chinese' ? 'selected' : '' %> >Chinese</option>
+                                                    <option value="japanese" <%= restaurant?.cuisine.toLowerCase() == 'japanese' ? 'selected' : '' %> >Japanese</option>
+                                                    <option value="indian" <%= restaurant?.cuisine.toLowerCase() == 'indian' ? 'selected' : '' %> >Indian</option>
+                                                    <option value="mexican" <%= restaurant?.cuisine.toLowerCase() == 'mexican' ? 'selected' : '' %> >Mexican</option>
+                                                    <option value="french" <%= restaurant?.cuisine.toLowerCase() == 'french' ? 'selected' : '' %> >French</option>
+                                                    <option value="thai" <%= restaurant?.cuisine.toLowerCase() == 'thai' ? 'selected' : '' %> >Thai</option>
+                                                    <option value="spanish" <%= restaurant?.cuisine.toLowerCase() == 'spanish' ? 'selected' : '' %> >Spanish</option>
+                                                    <option value="greek" <%= restaurant?.cuisine.toLowerCase() == 'greek' ? 'selected' : '' %> >Greek</option>
+                                                    <option value="mediterranean" <%= restaurant?.cuisine.toLowerCase() == 'mediterranean' ? 'selected' : '' %> >Mediterranean</option>
+                                                    <option value="vietnamese" <%= restaurant?.cuisine.toLowerCase() == 'vietnamese' ? 'selected' : '' %> >Vietnamese</option>
+                                                    <option value="korean" <%= restaurant?.cuisine.toLowerCase() == 'korean' ? 'selected' : '' %> >Korean</option>
+                                                    <option value="brazilian" <%= restaurant?.cuisine.toLowerCase() == 'brazilian' ? 'selected' : '' %> >Brazilian</option>
+                                                    <option value="turkish" <%= restaurant?.cuisine.toLowerCase() == 'turkish' ? 'selected' : '' %> >Turkish</option>
                                                 </select>
                                                 <% if (errors && errors.cuisine) { %>
                                                     <span style="color: red;"><%= errors.cuisine[0] %></span>

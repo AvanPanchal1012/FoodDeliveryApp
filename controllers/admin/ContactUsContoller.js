@@ -14,13 +14,15 @@ module.exports = {
       const total = 5;
       const start = (currentPage - 1) * total;
       const data = await Contact.find().skip(start).limit(total);
-      const totalPage = Math.ceil(await Contact.find().countDocuments() / total);
-      
+      var totalRec = await Contact.find().countDocuments();
+      const totalPage = Math.ceil(totalRec / total);
+    
       res.render('admin/contactInquiries', {
           loginUser: loginUser,
           data: data,
           currentPage: currentPage,
-          count: totalPage
+          count: totalPage,
+          totalRec: totalRec
       })
     }
     else {

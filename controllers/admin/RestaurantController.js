@@ -108,13 +108,16 @@ module.exports = {
         const total = 5;
         const start = (currentPage - 1) * total;
         const data = await Restaurant.find().populate('dishIds', 'dname').skip(start).limit(total);
-        const totalPage = Math.ceil(await Restaurant.find().countDocuments() / total);
-     
+       
+        var totalRec = await Restaurant.find().countDocuments();
+        const totalPage = Math.ceil(totalRec / total);
+      
         res.render('admin/adminRestaurants', {
             loginUser: loginUser,
             data: data,
             currentPage: currentPage,
-            count: totalPage
+            count: totalPage,
+            totalRec: totalRec
         })
       }
       else {
@@ -231,7 +234,7 @@ module.exports = {
         const loginUser = await checkLoginSession(req, res);
 
         if (loginUser) {
-          const data = await User.deleteOne({ "_id": req.params.id })
+          const data = await Restaurant.deleteOne({ "_id": req.params.id })
           if (data) {
               console.log("file is deleted...")
               res.redirect('/admin/restaurants')

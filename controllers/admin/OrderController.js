@@ -15,13 +15,15 @@ module.exports = {
             const total = 5;
             const start = (currentPage - 1) * total;
             const data = await Order.find().skip(start).limit(total);
-            const totalPage = Math.ceil(await Order.find().countDocuments() / total);
-
+            var totalRec = await Order.find().countDocuments();
+            const totalPage = Math.ceil(totalRec / total);
+          
             res.render('admin/adminOrders', {
                 loginUser: loginUser,
                 orders: data,
                 currentPage: currentPage,
-                count: totalPage
+                count: totalPage,
+                totalRec: totalRec
             })
         }
         else {

@@ -101,13 +101,15 @@ module.exports = {
         const total = 5;
         const start = (currentPage - 1) * total;
         const data = await User.find({type : {$ne: 'admin'}}).skip(start).limit(total);
-        const totalPage = Math.ceil(await User.find({type : {$ne: 'admin'}}).countDocuments() / total);
+        var totalRec = await User.find().countDocuments();
+        const totalPage = Math.ceil(totalRec / total);
         
         res.render('admin/adminUsers', {
             loginUser: loginUser,
             users: data,
             currentPage: currentPage,
-            count: totalPage
+            count: totalPage,
+            totalRec: totalRec
         })
       }
       else {

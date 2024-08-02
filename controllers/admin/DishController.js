@@ -88,13 +88,15 @@ module.exports = {
           const total = 5;
           const start = (currentPage - 1) * total;
           const data = await Dish.find().skip(start).limit(total);
-          const totalPage = Math.ceil(await Dish.find().countDocuments() / total);
+          var totalRec = await Dish.find().countDocuments();
+          const totalPage = Math.ceil(totalRec / total);
         
           res.render('admin/adminDishes', {
               loginUser: loginUser,
               data: data,
               currentPage: currentPage,
-              count: totalPage
+              count: totalPage,
+              totalRec: totalRec
           })
         }
         else {
@@ -175,7 +177,7 @@ module.exports = {
                 };
           
                 if (req.file) {
-                  updateData.profileImage = req.file.filename;
+                  updateData.photo = req.file.filename;
                 }
           
                 const dish = await Dish.findByIdAndUpdate(dishId, updateData, { new: true });
@@ -197,7 +199,7 @@ module.exports = {
         const loginUser = await checkLoginSession(req, res);
         
         if (loginUser) {
-          const data = await User.deleteOne({ "_id": req.params.id })
+          const data = await Dish.deleteOne({ "_id": req.params.id })
           if (data) {
               console.log("file is deleted...")
               res.redirect('/admin/dishes')
