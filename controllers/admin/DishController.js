@@ -166,7 +166,7 @@ module.exports = {
                     loginUser: loginUser
                 })
               } else { 
-                const updateData = { 
+                var updateData = { 
                   dname: req.body.name,
                   dtype: req.body.type,
                   dprice: req.body.price,
@@ -177,9 +177,9 @@ module.exports = {
                 };
           
                 if (req.file) {
-                  updateData.photo = req.file.filename;
+                  updateData.photo = `/uploads/${req.file.filename}`;
                 }
-          
+               
                 const dish = await Dish.findByIdAndUpdate(dishId, updateData, { new: true });
           
                 if (!dish) {

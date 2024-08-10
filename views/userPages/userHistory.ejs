@@ -56,14 +56,14 @@
                             <% history.forEach(function(item) { %>
                             <tr>
                                 <td>
-                                    <img style="width:50px;height:50px;border-radius:50%" src="/static/dishImage/<%= item.photo %>" alt="">
+                                    <img style="width:50px;height:50px;border-radius:50%" src="<%= item.photo %>" alt="">
                                 </td>
                                 <td><%= item.dname %></td>
                                 <td><%= item.time %></td>
                                 <td><%= item.price %></td>
                                 <td><%= item.quantity %></td>
                                 <td><%= item.paymentType %></td>
-                                <td><%= item.status %></td>
+                                <td><%= item.states %></td>
                             </tr>
                             <% }); %>
                         </tbody>

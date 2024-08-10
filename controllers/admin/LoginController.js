@@ -12,7 +12,7 @@ module.exports = {
         const loginUser = await User.findOne({ email: req.body.email, type: 'admin' });
        
         if (!loginUser || !await loginUser.matchPassword(req.body.password)) {
-          res.render("login", {
+          res.render("admin/adminLogin", {
             loginUser: null,
             loginFirst: true,
           });
